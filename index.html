@@ -320,6 +320,63 @@
   .vp-message.big{color:var(--gold); text-shadow:0 0 12px rgba(201,162,75,0.6);}
   .vp-sub{font-family:var(--mono); font-size:11px; color:var(--gold-dim); margin-bottom:12px; text-align:center;}
 
+  /* ---- THE VAULT (puzzle gauntlet) ---- */
+  .vt-grid{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;
+    width:100%; max-width:420px; margin-top:14px;
+  }
+  .vt-tile{
+    aspect-ratio:1; border:1px solid var(--rail-light); border-radius:6px;
+    background:linear-gradient(160deg, var(--felt), var(--felt-dark));
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; gap:2px;
+  }
+  .vt-tile:active{transform:scale(0.95);}
+  .vt-tile .num{font-family:var(--display); font-size:19px; color:var(--gold);}
+  .vt-tile .st{font-family:var(--mono); font-size:8.5px; letter-spacing:1px; color:var(--ink); text-transform:uppercase;}
+  .vt-tile.locked{opacity:0.32; cursor:default;}
+  .vt-tile.locked .num{color:var(--ink);}
+  .vt-tile.cleared{border-color:var(--win);}
+  .vt-tile.cleared .num{color:var(--win);}
+  .vt-head{display:flex; align-items:center; gap:18px; margin-bottom:10px; flex-wrap:wrap; justify-content:center;}
+  .vt-floor{font-family:var(--display); font-size:18px; color:var(--cream);}
+  .vt-gates{display:flex; gap:5px; align-items:center;}
+  .vt-dot{width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,0.14);}
+  .vt-dot.done{background:var(--win);}
+  .vt-dot.cur{background:var(--gold); box-shadow:0 0 6px var(--gold);}
+  .vt-lives{font-size:15px; letter-spacing:3px; color:var(--red);}
+  .vt-lives .lost{opacity:0.22;}
+  .vt-prompt{
+    font-family:var(--display); font-size:16.5px; color:var(--cream); text-align:center;
+    max-width:420px; margin:8px 0 4px; line-height:1.5;
+  }
+  .vt-prompt b{color:var(--gold);}
+  .vt-hint{font-family:var(--mono); font-size:10px; color:var(--gold-dim); margin-bottom:8px;}
+  .vt-table{display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:10px 0;}
+  .vt-choices{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:12px 0 4px;}
+  .vt-choice{cursor:pointer; border-radius:6px;}
+  .vt-choice:active .card{transform:translateY(-3px);}
+  .vt-choice.right .card{box-shadow:0 0 0 2px var(--win), 0 0 16px rgba(111,174,106,0.6);}
+  .vt-choice.wrong .card{box-shadow:0 0 0 2px var(--red), 0 0 16px rgba(181,67,58,0.6); filter:brightness(0.8);}
+  .vt-choice.frozen{cursor:default;}
+  .vt-peekbar{
+    width:100%; max-width:300px; height:7px; border-radius:4px;
+    background:rgba(0,0,0,0.4); border:1px solid var(--rail); overflow:hidden; margin:12px 0;
+  }
+  .vt-peekbar .fill{
+    height:100%; background:var(--gold); width:100%;
+    animation-name:vtshrink; animation-timing-function:linear; animation-fill-mode:forwards;
+  }
+  @keyframes vtshrink{from{width:100%;} to{width:0%;}}
+  .vt-result{
+    margin-top:16px; text-align:center; background:var(--felt-dark); border:1px solid var(--gold-dim);
+    border-radius:8px; padding:18px 24px; max-width:380px;
+  }
+  .vt-result .t{font-family:var(--display); font-size:21px; color:var(--gold); margin-bottom:6px;}
+  .vt-result .t.fail{color:var(--red);}
+  .vt-result .d{font-size:13px; color:var(--ink); margin-bottom:14px; line-height:1.5;}
+  .vt-sub{font-family:var(--mono); font-size:11px; color:var(--gold-dim); margin-bottom:6px; text-align:center;}
+
   /* ---- desktop scaling: bigger cards & wider felts on large screens ---- */
   @media (min-width:760px){
     .card{width:78px; height:110px; font-size:24px; border-radius:8px;}
@@ -365,6 +422,14 @@
     .vp-hand{gap:12px;}
     .vp-paytable{font-size:13px; min-width:320px;}
     .vp-message{font-size:20px;}
+
+    .vt-grid{max-width:560px; gap:14px;}
+    .vt-tile .num{font-size:24px;}
+    .vt-tile .st{font-size:10px;}
+    .vt-prompt{font-size:20px; max-width:560px;}
+    .vt-hint{font-size:12px;}
+    .vt-table{gap:9px;}
+    .vt-choices{gap:12px;}
   }
 </style>
 </head>
@@ -380,7 +445,7 @@
 
   <div id="hub-screen" class="screen active">
     <div class="hub-hero">
-      <div class="eyebrow">Five tables &middot; one deck &middot; no signal required</div>
+      <div class="eyebrow">Six tables &middot; one deck &middot; no signal required</div>
       <h1>The Parlor</h1>
       <p>Offline card room. Pick a table &mdash; your chips and best scores carry over between hands.</p>
     </div>
@@ -421,6 +486,13 @@
         <p>Five cards, one draw. Hold what's worth keeping, ditch the rest, and let the paytable decide.</p>
         <div class="best" id="hub-videopoker-best">Chips: &mdash;</div>
       </div>
+      <div class="table-card" data-game="vault">
+        <div class="suits">&#9827;&#9824;&#9827;</div>
+        <div class="tag">Puzzle Gauntlet &middot; 30 Floors</div>
+        <h2>The Vault</h2>
+        <p>Ten locked gates stand between you and the next floor down. Solve the card puzzle to pass &mdash; three misses and the floor resets.</p>
+        <div class="best" id="hub-vault-best">Floor: &mdash;</div>
+      </div>
     </div>
   </div>
 
@@ -429,6 +501,7 @@
   <div id="holdem-screen" class="screen"></div>
   <div id="deadrun-screen" class="screen"></div>
   <div id="videopoker-screen" class="screen"></div>
+  <div id="vault-screen" class="screen"></div>
 
   <footer id="credits">THE PARLOR &middot; fully offline &middot; your device only</footer>
 </div>
@@ -467,6 +540,8 @@ const STORE_KEYS = {
   bank: 'parlor_bank',
   tripeaksBest: 'parlor_tripeaks_best',
   deadrunBest: 'parlor_deadrun_best',
+  vaultUnlocked: 'parlor_vault_unlocked',
+  vaultCleared: 'parlor_vault_cleared',
 };
 function getBank(){
   const v = localStorage.getItem(STORE_KEYS.bank);
@@ -487,6 +562,21 @@ function getDeadrunBest(){
 }
 function setDeadrunBest(v){
   if(v > getDeadrunBest()){ localStorage.setItem(STORE_KEYS.deadrunBest, String(v)); }
+}
+
+function getVaultUnlocked(){
+  const v = localStorage.getItem(STORE_KEYS.vaultUnlocked);
+  return v===null ? 1 : Math.max(1, parseInt(v,10));
+}
+function setVaultUnlocked(v){
+  if(v > getVaultUnlocked()){ localStorage.setItem(STORE_KEYS.vaultUnlocked, String(v)); }
+}
+function getVaultCleared(){
+  const v = localStorage.getItem(STORE_KEYS.vaultCleared);
+  return v===null ? 0 : parseInt(v,10);
+}
+function setVaultCleared(v){
+  if(v > getVaultCleared()){ localStorage.setItem(STORE_KEYS.vaultCleared, String(v)); }
 }
 
 function getTriBest(){
@@ -510,6 +600,8 @@ function refreshBankDisplay(){
   if(hubDR) hubDR.textContent = 'Best haul: ' + (getDeadrunBest() ? getDeadrunBest().toLocaleString() : '\u2014');
   const hubVP = document.getElementById('hub-videopoker-best');
   if(hubVP) hubVP.textContent = 'Chips: ' + getBank().toLocaleString();
+  const hubVT = document.getElementById('hub-vault-best');
+  if(hubVT) hubVT.textContent = getVaultCleared() ? ('Floor: ' + getVaultCleared() + '/30 cleared') : 'Floor: 1/30';
 }
 
 /* ---- navigation ---- */
@@ -527,12 +619,13 @@ function showScreen(name){
     bankD.classList.remove('show');
   } else {
     back.classList.add('show');
-    bankD.classList.toggle('show', name==='holdem' || name==='blackjack' || name==='deadrun' || name==='videopoker');
+    bankD.classList.toggle('show', name==='holdem' || name==='blackjack' || name==='deadrun' || name==='videopoker' || name==='vault');
     if(name==='tripeaks') title.textContent = 'Tri-Peaks';
     if(name==='holdem') title.textContent = "The High Table";
     if(name==='blackjack') title.textContent = 'Twenty-One';
     if(name==='deadrun') title.textContent = "Dead Man's Run";
     if(name==='videopoker') title.textContent = 'The Draw';
+    if(name==='vault') title.textContent = 'The Vault';
   }
   refreshBankDisplay();
   if(name==='tripeaks') TriPeaks.enter();
@@ -540,6 +633,7 @@ function showScreen(name){
   if(name==='holdem') Holdem.enter();
   if(name==='deadrun') DeadRun.enter();
   if(name==='videopoker') VideoPoker.enter();
+  if(name==='vault') Vault.enter();
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -1551,6 +1645,347 @@ const VideoPoker = (function(){
   }
 
   return { enter };
+})();
+
+
+/* ================= THE VAULT (puzzle gauntlet) ================= */
+const Vault = (function(){
+  const FLOORS = 30, GATES = 10, LIVES = 3;
+  let phase;            // 'select' | 'peek' | 'question' | 'feedback' | 'floorclear' | 'floorfail'
+  let floor, gate, lives, puzzle;
+  let chosenIdx, wasCorrect, reward;
+  let timerToken = 0;   // invalidates stale peek/feedback timers
+
+  /* ---- generation helpers ----
+     Puzzle math uses card values A=1, J=11, Q=12, K=13.
+     Display cards use the shared rank convention (14 = ace). */
+  function rnd(n){ return Math.floor(Math.random()*n); }
+  function pick(arr){ return arr[rnd(arr.length)]; }
+  function mkCardV(v, suit){ return {rank: v===1 ? 14 : v, suit: suit || SUITS[rnd(4)]}; }
+
+  // Effective difficulty: the floor sets the base, late gates tighten the screws.
+  function effLevel(){ return floor + (gate>=6 ? 1 : 0) + (gate>=9 ? 1 : 0); }
+
+  function genSum(L){
+    const nBase = Math.min(2 + Math.floor(L/8), 5);
+    const nCh = Math.min(3 + Math.floor(L/6), 6);
+    const base = [];
+    let s = 0;
+    for(let i=0;i<nBase;i++){ const v = 1 + rnd(10); base.push(v); s += v; }
+    const correct = 1 + rnd(13);
+    const target = s + correct;
+    const vals = new Set([correct]);
+    let guard = 0;
+    while(vals.size < nCh && guard++ < 200){
+      // late floors use near-miss decoys so you can't eyeball it
+      const d = L >= 10 ? correct + (rnd(7) - 3) : 1 + rnd(13);
+      if(d >= 1 && d <= 13) vals.add(d);
+    }
+    const showSum = L < 8 ? ` (they total <b>${s}</b>)` : '';
+    return {
+      type:'sum',
+      prompt:`Tap the card that brings these${showSum} to exactly <b>${target}</b>.`,
+      hint:'A=1 · J=11 · Q=12 · K=13',
+      tableCards: base.map(v=>mkCardV(v)),
+      choices: shuffle([...vals]).map(v=>({card:mkCardV(v), correct:v===correct})),
+    };
+  }
+
+  function genSeq(L){
+    let pool = [[1,1],[2,2]];
+    if(L>=5) pool = pool.concat([[3,3],[-1,-1],[-2,-2]]);
+    if(L>=12) pool = pool.concat([[1,3],[3,1],[-3,-3],[2,-1]]);
+    if(L>=20) pool = pool.concat([[4,1],[-1,3],[4,-2],[1,-2]]);
+    let steps = pick(pool);
+    let starts = [];
+    for(let t0=1;t0<=13;t0++){
+      let ok = true, t = t0;
+      for(let i=0;i<4;i++){ t += steps[i%2]; if(t<1 || t>13){ ok=false; break; } }
+      if(ok) starts.push(t0);
+    }
+    if(starts.length===0){ steps=[1,1]; starts=[1,2,3,4,5,6,7,8,9]; } // safety net: no valid start fits in A..K
+    let seq = [pick(starts)];
+    for(let i=0;i<4;i++){ seq.push(seq[seq.length-1] + steps[i%2]); }
+    const correct = seq[4];
+    const vals = new Set([correct]);
+    let guard = 0;
+    while(vals.size < 4 && guard++ < 200){
+      const d = correct + (rnd(5) - 2);
+      if(d >= 1 && d <= 13) vals.add(d);
+    }
+    return {
+      type:'seq',
+      prompt:'Which card comes next in the run?',
+      hint:'A=1 · J=11 · Q=12 · K=13',
+      tableCards: seq.slice(0,4).map(v=>mkCardV(v)),
+      mystery:true,
+      choices: shuffle([...vals]).map(v=>({card:mkCardV(v), correct:v===correct})),
+    };
+  }
+
+  function genOdd(L){
+    const n = Math.min(4 + Math.floor(L/10), 6);
+    let modes = ['color'];
+    if(L>=6) modes.push('suit');
+    if(L>=14) modes.push('parity');
+    if(L>=20) modes.push('face');
+    const mode = pick(modes.slice(L>=14 ? 1 : 0)); // drop the easiest mode once harder ones exist
+    const cards = [];
+    if(mode==='color' || mode==='suit'){
+      // majority ranks: number cards with mixed parity so parity can't be a red herring
+      const majRanks = [];
+      while(majRanks.length < n-1){
+        const v = 2 + rnd(9);
+        majRanks.push(v);
+      }
+      if(majRanks.every(v=>v%2===0)) majRanks[0] = 3;
+      if(majRanks.every(v=>v%2===1)) majRanks[0] = 4;
+      if(mode==='color'){
+        const redMaj = rnd(2)===0;
+        const majSuits = redMaj ? ['H','D'] : ['S','C'];
+        const oddSuits = redMaj ? ['S','C'] : ['H','D'];
+        majRanks.forEach(v=> cards.push(mkCardV(v, pick(majSuits))));
+        cards.push(mkCardV(2+rnd(9), pick(oddSuits)));
+      } else {
+        const suit = pick(SUITS);
+        // late floors: the stray card is the SAME color, different suit — subtle
+        const sameColor = {H:'D', D:'H', S:'C', C:'S'};
+        const oddSuit = L>=16 ? sameColor[suit] : pick(SUITS.filter(s=>s!==suit && !(L<16 && sameColor[suit]===s)));
+        majRanks.forEach(v=> cards.push(mkCardV(v, suit)));
+        cards.push(mkCardV(2+rnd(9), oddSuit));
+      }
+    } else if(mode==='parity'){
+      // one suit only, so rank parity is the only signal
+      const suit = pick(SUITS);
+      const evens = [2,4,6,8,10,12], odds = [3,5,7,9,11,13];
+      const majEven = rnd(2)===0;
+      const majPool = shuffle(majEven ? evens : odds).slice(0, n-1);
+      majPool.forEach(v=> cards.push(mkCardV(v, suit)));
+      cards.push(mkCardV(pick(majEven ? odds : evens), suit));
+    } else { // face: all faces plus one number card, stray suit must not be unique
+      const faceRanks = [11,12,13];
+      const suitsUsed = [];
+      for(let i=0;i<n-1;i++){ const s = pick(SUITS); suitsUsed.push(s); cards.push(mkCardV(pick(faceRanks), s)); }
+      cards.push(mkCardV(2+rnd(9), pick(suitsUsed)));
+    }
+    const correctCard = cards[cards.length-1];
+    const mixed = shuffle(cards);
+    return {
+      type:'odd',
+      prompt:'One of these cards doesn’t belong. Tap it.',
+      hint: mode==='parity' ? 'look at the numbers' : (mode==='face' ? 'court or common?' : 'look closely'),
+      choices: mixed.map(c=>({card:c, correct:c===correctCard})),
+    };
+  }
+
+  function genFlash(L){
+    const n = Math.min(3 + Math.floor(L/7), 7);
+    const peekMs = Math.max(4000 - L*100, 1500);
+    // distinct ranks everywhere so recall is about the cards, not suit trickery
+    const allVals = shuffle([1,2,3,4,5,6,7,8,9,10,11,12,13]);
+    const shownVals = allVals.slice(0, n);
+    const hiddenVals = allVals.slice(n);
+    const shown = shownVals.map(v=>mkCardV(v));
+    const notShown = L>=12 && rnd(2)===0;
+    let choices;
+    if(notShown){
+      const stranger = mkCardV(hiddenVals[0]);
+      choices = shuffle(shown.slice(0,3).map(c=>({card:c, correct:false})).concat([{card:stranger, correct:true}]));
+    } else {
+      const answer = pick(shown);
+      const decoys = hiddenVals.slice(0,3).map(v=>({card:mkCardV(v), correct:false}));
+      choices = shuffle([{card:answer, correct:true}].concat(decoys));
+    }
+    return {
+      type:'flash',
+      peekCards: shown,
+      peekMs,
+      prompt: notShown ? 'Which card was <b>NOT</b> on the table?' : 'Which of these was on the table?',
+      hint:'from memory',
+      choices,
+    };
+  }
+
+  function newPuzzle(){
+    const L = effLevel();
+    const types = ['sum','seq','odd'];
+    if(floor>=2 || gate>=4) types.push('flash');
+    const t = pick(types);
+    puzzle = t==='sum' ? genSum(L) : t==='seq' ? genSeq(L) : t==='odd' ? genOdd(L) : genFlash(L);
+    chosenIdx = -1; wasCorrect = false;
+    if(puzzle.type==='flash'){
+      phase = 'peek';
+      const tok = ++timerToken;
+      setTimeout(()=>{ if(tok===timerToken && phase==='peek'){ phase='question'; render(); } }, puzzle.peekMs);
+    } else {
+      phase = 'question';
+    }
+    render();
+  }
+
+  function startFloor(f){
+    floor = f; gate = 1; lives = LIVES;
+    newPuzzle();
+  }
+
+  function answer(i){
+    if(phase!=='question') return;
+    chosenIdx = i;
+    wasCorrect = puzzle.choices[i].correct;
+    phase = 'feedback';
+    render();
+    const tok = ++timerToken;
+    setTimeout(()=>{
+      if(tok!==timerToken) return;
+      if(wasCorrect){
+        if(gate===GATES){
+          const firstClear = floor > getVaultCleared();
+          reward = firstClear ? 100 + floor*25 : 50;
+          addBank(reward);
+          setVaultCleared(floor);
+          if(floor < FLOORS) setVaultUnlocked(floor+1);
+          phase = 'floorclear';
+          render();
+        } else {
+          gate++;
+          newPuzzle();
+        }
+      } else {
+        lives--;
+        if(lives<=0){ phase='floorfail'; render(); }
+        else { newPuzzle(); } // fresh lock on the same gate
+      }
+    }, wasCorrect ? 750 : 1100);
+  }
+
+  /* ---- rendering ---- */
+  function livesHtml(){
+    let h='';
+    for(let i=0;i<LIVES;i++){ h += `<span class="${i<lives?'':'lost'}">&#9829;</span>`; }
+    return `<span class="vt-lives">${h}</span>`;
+  }
+  function dotsHtml(){
+    let h='';
+    for(let g=1;g<=GATES;g++){
+      h += `<span class="vt-dot ${g<gate?'done':(g===gate?'cur':'')}"></span>`;
+    }
+    return `<div class="vt-gates">${h}</div>`;
+  }
+  function headHtml(){
+    return `<div class="vt-head">
+      <span class="vt-floor">Floor ${floor}</span>
+      ${dotsHtml()}
+      ${livesHtml()}
+      <button class="btn" id="vt-leave" style="font-size:11px; padding:4px 10px;">Leave</button>
+    </div>`;
+  }
+  function wireLeave(el){
+    const lv = el.querySelector('#vt-leave');
+    if(lv) lv.addEventListener('click', ()=>{ timerToken++; phase='select'; render(); });
+  }
+
+  function render(){
+    const el = document.getElementById('vault-screen');
+    if(!el) return;
+
+    if(phase==='select'){
+      const unlocked = getVaultUnlocked(), cleared = getVaultCleared();
+      let tiles='';
+      for(let f=1;f<=FLOORS;f++){
+        const locked = f>unlocked;
+        const cls = locked ? 'locked' : (f<=cleared ? 'cleared' : '');
+        const st = locked ? 'locked' : (f<=cleared ? 'clear' : 'open');
+        tiles += `<div class="vt-tile ${cls}" ${locked?'':`data-floor="${f}"`}><span class="num">${f}</span><span class="st">${st}</span></div>`;
+      }
+      el.innerHTML = `
+        <div class="dr-felt">
+          <div class="bj-title">Pick a floor</div>
+          <div class="vt-sub">10 gates per floor &middot; 3 misses and the floor resets<br>clear a floor to unlock the next one down</div>
+          <div class="vt-grid">${tiles}</div>
+        </div>`;
+      el.querySelectorAll('.vt-tile[data-floor]').forEach(t=>{
+        t.addEventListener('click', ()=> startFloor(parseInt(t.dataset.floor,10)));
+      });
+      return;
+    }
+
+    if(phase==='peek'){
+      el.innerHTML = `
+        <div class="dr-felt">
+          ${headHtml()}
+          <div class="vt-prompt">Memorize the table&hellip;</div>
+          <div class="vt-table">${puzzle.peekCards.map(c=>cardHtml(c)).join('')}</div>
+          <div class="vt-peekbar"><div class="fill" style="animation-duration:${puzzle.peekMs}ms"></div></div>
+        </div>`;
+      wireLeave(el);
+      return;
+    }
+
+    if(phase==='floorclear' || phase==='floorfail'){
+      const cleared = phase==='floorclear';
+      const nextF = floor+1;
+      el.innerHTML = `
+        <div class="dr-felt">
+          ${headHtml()}
+          <div class="vt-result">
+            <div class="t ${cleared?'':'fail'}">${cleared ? `Floor ${floor} cleared!` : 'The gate holds.'}</div>
+            <div class="d">${cleared
+              ? `All ten gates opened. The house pays <b>${reward.toLocaleString()}</b> chips.${floor<FLOORS ? ' Floor '+nextF+' is unlocked.' : ' You’ve emptied the entire vault.'}`
+              : 'Three misses. The locks reset behind you.'}</div>
+            <div class="btn-row">
+              ${cleared
+                ? (floor<FLOORS ? `<button class="btn primary" id="vt-next">Descend to Floor ${nextF}</button>` : '')
+                : `<button class="btn primary" id="vt-retry">Retry Floor ${floor}</button>`}
+              <button class="btn" id="vt-floors">All Floors</button>
+            </div>
+          </div>
+        </div>`;
+      const nx = document.getElementById('vt-next'); if(nx) nx.addEventListener('click', ()=> startFloor(floor+1));
+      const rt = document.getElementById('vt-retry'); if(rt) rt.addEventListener('click', ()=> startFloor(floor));
+      const fl = document.getElementById('vt-floors'); if(fl) fl.addEventListener('click', ()=>{ phase='select'; render(); });
+      wireLeave(el);
+      return;
+    }
+
+    // question / feedback
+    const frozen = phase==='feedback';
+    const choicesHtml = puzzle.choices.map((ch,i)=>{
+      let cls='';
+      if(frozen){
+        if(ch.correct) cls='right';
+        else if(i===chosenIdx) cls='wrong';
+      }
+      return `<div class="vt-choice ${cls} ${frozen?'frozen':''}" data-i="${i}">${cardHtml(ch.card)}</div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="dr-felt">
+        ${headHtml()}
+        <div class="vt-prompt">${puzzle.prompt}</div>
+        ${puzzle.tableCards ? `<div class="vt-table">${puzzle.tableCards.map(c=>cardHtml(c)).join('')}${puzzle.mystery ? cardHtml(null,{back:true}) : ''}</div>` : ''}
+        <div class="vt-choices">${choicesHtml}</div>
+        <div class="vt-hint">${puzzle.hint||''}</div>
+        ${frozen ? `<div class="vt-sub">${wasCorrect ? 'The lock turns.' : 'Wrong — the lock jams. New tumblers…'}</div>` : ''}
+      </div>`;
+
+    if(!frozen){
+      el.querySelectorAll('.vt-choice').forEach(c=>{
+        c.addEventListener('click', ()=> answer(parseInt(c.dataset.i,10)));
+      });
+    }
+    wireLeave(el);
+  }
+
+  function enter(){
+    if(!phase) phase='select';
+    render();
+  }
+
+  return { enter, _test: {
+    state: ()=>({phase, floor, gate, lives}),
+    puzzle: ()=>puzzle,
+    gen: (t,L)=> t==='sum' ? genSum(L) : t==='seq' ? genSeq(L) : t==='odd' ? genOdd(L) : genFlash(L),
+  } };
 })();
 
 </script>
