@@ -289,6 +289,83 @@
     .tp-slot .card{width:38px; height:54px; font-size:11px;}
     .dr-run .card{width:40px; height:57px; font-size:12px;}
   }
+
+  /* ---- THE DRAW (video poker) ---- */
+  .vp-hand{display:flex; gap:7px; justify-content:center; margin:16px 0 6px; flex-wrap:wrap;}
+  .vp-cardwrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .vp-cardwrap.clickable{cursor:pointer;}
+  .vp-held{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold); border:1px solid var(--gold-dim); padding:2px 8px; border-radius:3px;
+    opacity:0; transition:opacity .12s;
+  }
+  .vp-cardwrap.held .vp-held{opacity:1;}
+  .vp-cardwrap.held .card{
+    transform:translateY(-7px);
+    box-shadow:0 0 0 2px var(--gold), 0 8px 16px rgba(0,0,0,0.5);
+  }
+  .vp-paytable{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink);
+    background:rgba(0,0,0,0.25); border:1px solid var(--rail); border-radius:6px;
+    padding:10px 16px; margin:12px 0 4px; min-width:250px;
+  }
+  .vp-paytable .row{display:flex; justify-content:space-between; gap:26px; padding:1.5px 4px; border-radius:3px;}
+  .vp-paytable .row.hit{color:var(--gold); background:rgba(201,162,75,0.14);}
+  .vp-message{
+    font-family:var(--display); font-size:17px; text-align:center; padding:9px 16px;
+    border-radius:6px; margin:10px 0 12px; background:rgba(0,0,0,0.25); color:var(--cream);
+  }
+  .vp-message.win{color:var(--win);}
+  .vp-message.lose{color:var(--red);}
+  .vp-message.big{color:var(--gold); text-shadow:0 0 12px rgba(201,162,75,0.6);}
+  .vp-sub{font-family:var(--mono); font-size:11px; color:var(--gold-dim); margin-bottom:12px; text-align:center;}
+
+  /* ---- desktop scaling: bigger cards & wider felts on large screens ---- */
+  @media (min-width:760px){
+    .card{width:78px; height:110px; font-size:24px; border-radius:8px;}
+    .card .rankmark{font-size:23px;}
+    .card .suitmark{font-size:20px; margin-top:3px;}
+    .card.sm{width:54px; height:76px;}
+    .card.sm .rankmark{font-size:16px;}
+    .card.sm .suitmark{font-size:14px;}
+
+    .tp-peaks{gap:14px; max-width:900px;}
+    .tp-slot{width:68px; height:96px;}
+    .tp-slot .card{width:68px; height:96px; font-size:19px;}
+    .tp-slot .card .rankmark{font-size:18px;}
+    .tp-slot .card .suitmark{font-size:16px;}
+    .tp-row{margin-top:-58px; gap:5px;}
+    .tp-row0{margin-top:0;}
+    .tp-bottom{gap:40px; margin-top:34px;}
+    .tp-hud{gap:34px;}
+    .tp-stat .lbl{font-size:11px;}
+    .tp-stat .val{font-size:22px;}
+
+    .bj-felt, .hd-felt, .dr-felt{max-width:760px; padding:30px 24px 40px;}
+    .bj-hand{gap:9px;}
+    .bj-title, .hd-title{font-size:26px;}
+    .bj-label{font-size:13px;}
+    .bj-message, .hd-message{font-size:19px;}
+
+    .hd-board{gap:9px; min-height:110px;}
+    .hd-seats{gap:20px;}
+    .hd-seat{min-width:150px; padding:14px 16px;}
+    .hd-seat-name{font-size:16px;}
+    .hd-cards{min-height:76px;}
+    .hd-seat-stat{font-size:12.5px;}
+
+    .dr-run{max-width:700px; gap:8px; min-height:114px;}
+    .dr-run .card{width:70px; height:99px; font-size:20px;}
+    .dr-meter{max-width:460px;}
+    .dr-ladder{font-size:13.5px;}
+    .dr-hud{gap:34px;}
+
+    .btn{font-size:15px; padding:12px 22px;}
+
+    .vp-hand{gap:12px;}
+    .vp-paytable{font-size:13px; min-width:320px;}
+    .vp-message{font-size:20px;}
+  }
 </style>
 </head>
 <body>
@@ -303,7 +380,7 @@
 
   <div id="hub-screen" class="screen active">
     <div class="hub-hero">
-      <div class="eyebrow">Four tables &middot; one deck &middot; no signal required</div>
+      <div class="eyebrow">Five tables &middot; one deck &middot; no signal required</div>
       <h1>The Parlor</h1>
       <p>Offline card room. Pick a table &mdash; your chips and best scores carry over between hands.</p>
     </div>
@@ -337,6 +414,13 @@
         <p>Ante up and flip cards one at a time. Pair a rank you've already flipped and the house takes it all &mdash; bank before the deck bites.</p>
         <div class="best" id="hub-deadrun-best">Best haul: &mdash;</div>
       </div>
+      <div class="table-card" data-game="videopoker">
+        <div class="suits">&#9830;&#9827;</div>
+        <div class="tag">Video Poker &middot; Jacks or Better</div>
+        <h2>The Draw</h2>
+        <p>Five cards, one draw. Hold what's worth keeping, ditch the rest, and let the paytable decide.</p>
+        <div class="best" id="hub-videopoker-best">Chips: &mdash;</div>
+      </div>
     </div>
   </div>
 
@@ -344,6 +428,7 @@
   <div id="blackjack-screen" class="screen"></div>
   <div id="holdem-screen" class="screen"></div>
   <div id="deadrun-screen" class="screen"></div>
+  <div id="videopoker-screen" class="screen"></div>
 
   <footer id="credits">THE PARLOR &middot; fully offline &middot; your device only</footer>
 </div>
@@ -423,6 +508,8 @@ function refreshBankDisplay(){
   if(hubTri) hubTri.textContent = 'Best: ' + (getTriBest() ? getTriBest().toLocaleString() : '\u2014');
   const hubDR = document.getElementById('hub-deadrun-best');
   if(hubDR) hubDR.textContent = 'Best haul: ' + (getDeadrunBest() ? getDeadrunBest().toLocaleString() : '\u2014');
+  const hubVP = document.getElementById('hub-videopoker-best');
+  if(hubVP) hubVP.textContent = 'Chips: ' + getBank().toLocaleString();
 }
 
 /* ---- navigation ---- */
@@ -440,17 +527,19 @@ function showScreen(name){
     bankD.classList.remove('show');
   } else {
     back.classList.add('show');
-    bankD.classList.toggle('show', name==='holdem' || name==='blackjack' || name==='deadrun');
+    bankD.classList.toggle('show', name==='holdem' || name==='blackjack' || name==='deadrun' || name==='videopoker');
     if(name==='tripeaks') title.textContent = 'Tri-Peaks';
     if(name==='holdem') title.textContent = "The High Table";
     if(name==='blackjack') title.textContent = 'Twenty-One';
     if(name==='deadrun') title.textContent = "Dead Man's Run";
+    if(name==='videopoker') title.textContent = 'The Draw';
   }
   refreshBankDisplay();
   if(name==='tripeaks') TriPeaks.enter();
   if(name==='blackjack') Blackjack.enter();
   if(name==='holdem') Holdem.enter();
   if(name==='deadrun') DeadRun.enter();
+  if(name==='videopoker') VideoPoker.enter();
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -1311,6 +1400,154 @@ const DeadRun = (function(){
 
   function enter(){
     if(!phase){ startAnte(); } else { render(); }
+  }
+
+  return { enter };
+})();
+
+
+/* ================= THE DRAW (video poker) ================= */
+const VideoPoker = (function(){
+  // Classic Jacks-or-Better paytable (per chip bet; a pay of 1 returns the bet)
+  const PAYS = [
+    {key:'royal',    name:'Royal Flush',     pay:250},
+    {key:'sf',       name:'Straight Flush',  pay:50},
+    {key:'quads',    name:'Four of a Kind',  pay:25},
+    {key:'fh',       name:'Full House',      pay:9},
+    {key:'flush',    name:'Flush',           pay:6},
+    {key:'straight', name:'Straight',        pay:4},
+    {key:'trips',    name:'Three of a Kind', pay:3},
+    {key:'twopair',  name:'Two Pair',        pay:2},
+    {key:'jacks',    name:'Jacks or Better', pay:1},
+  ];
+  let deck, hand, held, bet, phase, resultKey, message, msgCls;
+
+  function classify(cards){
+    const e = evaluate5(cards);
+    if(e.cat===8) return e.tie[0]===14 ? 'royal' : 'sf';
+    if(e.cat===7) return 'quads';
+    if(e.cat===6) return 'fh';
+    if(e.cat===5) return 'flush';
+    if(e.cat===4) return 'straight';
+    if(e.cat===3) return 'trips';
+    if(e.cat===2) return 'twopair';
+    if(e.cat===1 && e.tie[0]>=11) return 'jacks';
+    return null;
+  }
+  function payFor(key){
+    const row = PAYS.find(p=>p.key===key);
+    return row ? row.pay : 0;
+  }
+
+  function startBetting(){
+    phase = 'bet';
+    message = ''; msgCls = ''; resultKey = null;
+    render();
+  }
+
+  function deal(amount){
+    const bank = getBank();
+    if(amount > bank) amount = bank;
+    if(amount <= 0) return;
+    bet = amount;
+    addBank(-bet);
+    deck = shuffle(buildDeck());
+    hand = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+    held = [false,false,false,false,false];
+    phase = 'draw';
+    resultKey = classify(hand); // live hint: highlight what's already made
+    message = ''; msgCls = '';
+    render();
+  }
+
+  function toggleHold(i){
+    if(phase!=='draw') return;
+    held[i] = !held[i];
+    render();
+  }
+
+  function draw(){
+    if(phase!=='draw') return;
+    for(let i=0;i<5;i++){ if(!held[i]) hand[i] = deck.pop(); }
+    resultKey = classify(hand);
+    const pay = payFor(resultKey);
+    const winnings = bet * pay;
+    phase = 'result';
+    if(pay===0){
+      message = 'No pay. The house keeps ' + bet.toLocaleString() + '.';
+      msgCls = 'lose';
+    } else {
+      const row = PAYS.find(p=>p.key===resultKey);
+      addBank(winnings);
+      if(pay===1){ message = row.name + '. Your bet comes back.'; msgCls = ''; }
+      else {
+        message = row.name + '! Pays ' + pay + ':1 — ' + winnings.toLocaleString() + ' chips.';
+        msgCls = pay>=25 ? 'big' : 'win';
+      }
+    }
+    render();
+  }
+
+  function render(){
+    const el = document.getElementById('videopoker-screen');
+    if(!el) return;
+    const bank = getBank();
+
+    if(phase==='bet'){
+      const presets = [10,25,50,100];
+      el.innerHTML = `
+        <div class="dr-felt">
+          <div class="bj-title">Place your bet</div>
+          <div class="bj-bank">Bank: <span class="mono">${bank.toLocaleString()}</span> chips</div>
+          <div class="vp-sub">Five cards down, hold what you like, draw once.<br>Jacks or better gets your bet back &mdash; the rest pays up.</div>
+          <div class="btn-row">
+            ${presets.map(p=>`<button class="btn vp-bet-btn" data-amt="${p}" ${p>bank?'disabled':''}>${p}</button>`).join('')}
+            <button class="btn primary" id="vp-allin" ${bank<=0?'disabled':''}>All-In (${bank})</button>
+          </div>
+          <div class="vp-paytable">
+            ${PAYS.map(p=>`<div class="row"><span>${p.name}</span><span>${p.pay}:1</span></div>`).join('')}
+          </div>
+          ${bank<=0 ? `<div class="dr-broke">You're out of chips. <button class="btn" id="vp-restock">Take a 500-chip marker</button></div>` : ''}
+        </div>`;
+      el.querySelectorAll('.vp-bet-btn').forEach(b=>b.addEventListener('click', ()=>deal(parseInt(b.dataset.amt,10))));
+      const ai = document.getElementById('vp-allin');
+      if(ai) ai.addEventListener('click', ()=>deal(bank));
+      const restock = document.getElementById('vp-restock');
+      if(restock) restock.addEventListener('click', ()=>{ addBank(500); render(); });
+      return;
+    }
+
+    const drawing = phase==='draw';
+    const handHtml = hand.map((c,i)=>`
+      <div class="vp-cardwrap ${held[i]?'held':''} ${drawing?'clickable':''}" data-i="${i}">
+        ${cardHtml(c)}
+        <span class="vp-held">Held</span>
+      </div>`).join('');
+
+    el.innerHTML = `
+      <div class="dr-felt">
+        <div class="bj-bank">Bank: <span class="mono">${bank.toLocaleString()}</span> &middot; Bet: <span class="mono">${bet.toLocaleString()}</span></div>
+        <div class="vp-hand">${handHtml}</div>
+        ${drawing ? `<div class="vp-sub">Tap cards to hold them, then draw.</div>` : ''}
+        ${message ? `<div class="vp-message ${msgCls}">${message}</div>` : ''}
+        <div class="btn-row">
+          ${drawing ? `<button class="btn primary" id="vp-draw">Draw</button>` : ''}
+          ${phase==='result' ? `<button class="btn primary" id="vp-next">Next Hand</button>` : ''}
+        </div>
+        <div class="vp-paytable">
+          ${PAYS.map(p=>`<div class="row ${resultKey===p.key?'hit':''}"><span>${p.name}</span><span>${p.pay}:1</span></div>`).join('')}
+        </div>
+      </div>`;
+
+    el.querySelectorAll('.vp-cardwrap.clickable').forEach(w=>{
+      w.addEventListener('click', ()=> toggleHold(parseInt(w.dataset.i,10)));
+    });
+    const drawB = document.getElementById('vp-draw'); if(drawB) drawB.addEventListener('click', draw);
+    const nextB = document.getElementById('vp-next'); if(nextB) nextB.addEventListener('click', startBetting);
+  }
+
+  function enter(){
+    if(!phase){ startBetting(); } else { render(); }
   }
 
   return { enter };
