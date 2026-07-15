@@ -377,6 +377,82 @@
   .vt-result .d{font-size:13px; color:var(--ink); margin-bottom:14px; line-height:1.5;}
   .vt-sub{font-family:var(--mono); font-size:11px; color:var(--gold-dim); margin-bottom:6px; text-align:center;}
 
+  /* vault: word chips */
+  .vt-chips{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:12px 0; max-width:460px;}
+  .vt-chip{
+    font-family:var(--mono); font-size:13px; letter-spacing:1px; padding:10px 14px;
+    border:1px solid var(--gold-dim); border-radius:5px; background:rgba(0,0,0,0.3);
+    color:var(--cream); cursor:pointer;
+  }
+  .vt-chip:active{transform:scale(0.96);}
+  .vt-chip.right{border-color:var(--win); color:var(--win); box-shadow:0 0 10px rgba(111,174,106,0.4);}
+  .vt-chip.wrong{border-color:var(--red); color:var(--red);}
+  .vt-code{font-family:var(--mono); font-size:34px; letter-spacing:8px; color:var(--gold); margin:16px 0;}
+
+  /* vault: anagram */
+  .vt-slots{display:flex; gap:6px; justify-content:center; margin:10px 0; flex-wrap:wrap;}
+  .vt-slotbox{
+    width:34px; height:42px; border:1px solid var(--gold-dim); border-radius:5px;
+    background:rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:20px; color:var(--gold);
+  }
+  .vt-tiles{display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin:8px 0;}
+  .vt-tilebtn{
+    width:40px; height:48px; border-radius:5px; border:1px solid #cfc6ae;
+    background:var(--card-bg); color:var(--card-ink);
+    font-family:var(--mono); font-weight:700; font-size:19px; cursor:pointer;
+  }
+  .vt-tilebtn:disabled{opacity:0.22;}
+
+  /* vault: wires */
+  .vt-wires{display:flex; gap:44px; justify-content:center; margin:12px 0;}
+  .vt-wcol{display:flex; flex-direction:column; gap:9px;}
+  .vt-wire{
+    min-width:84px; padding:9px 12px; border:1px solid var(--rail-light); border-radius:5px;
+    background:rgba(0,0,0,0.3); color:var(--cream); font-family:var(--mono); font-size:13px;
+    cursor:pointer; display:flex; align-items:center; gap:8px; justify-content:center;
+  }
+  .vt-wire .dot{width:14px; height:14px; border-radius:50%; display:inline-block;}
+  .vt-wire.sel{border-color:var(--gold); box-shadow:0 0 8px rgba(201,162,75,0.5);}
+  .vt-wire.done{opacity:0.4; border-color:var(--win); cursor:default;}
+
+  /* vault: keypad */
+  .vt-pad{display:grid; grid-template-columns:repeat(3, 64px); gap:8px; justify-content:center; margin:10px 0;}
+  .vt-key{
+    height:46px; border-radius:5px; border:1px solid var(--gold-dim);
+    background:rgba(0,0,0,0.35); color:var(--cream); font-family:var(--mono); font-size:18px; cursor:pointer;
+  }
+  .vt-key:active{transform:scale(0.95);}
+  .vt-entry{font-family:var(--mono); font-size:26px; letter-spacing:8px; color:var(--gold); min-height:34px; margin:8px 0;}
+
+  /* vault: dial */
+  .vt-dial{display:flex; flex-direction:column; align-items:center; gap:10px; margin:12px 0; width:100%; max-width:340px;}
+  .vt-dial input[type=range]{width:100%; accent-color:var(--gold);}
+  .vt-dial .cur{font-family:var(--mono); font-size:30px; color:var(--gold);}
+  .vt-dial .fb{font-family:var(--display); font-size:16px; color:var(--cream); min-height:22px; text-align:center;}
+
+  /* vault: simon */
+  .vt-simon{display:grid; grid-template-columns:repeat(2, 88px); gap:10px; justify-content:center; margin:14px 0;}
+  .vt-spad{
+    height:72px; border-radius:8px; border:2px solid rgba(255,255,255,0.15);
+    font-size:26px; color:var(--cream); cursor:pointer; opacity:0.6;
+    transition:opacity .1s, transform .1s, filter .1s;
+  }
+  .vt-spad.lit{opacity:1; transform:scale(1.06); filter:brightness(1.7); box-shadow:0 0 18px rgba(255,255,255,0.3);}
+  .vt-spad:disabled{cursor:default;}
+
+  /* vault: lockpick */
+  .vt-lock{width:100%; max-width:380px; margin:14px 0; display:flex; flex-direction:column; align-items:center; gap:12px;}
+  .vt-track{
+    position:relative; width:100%; height:26px; border-radius:13px;
+    background:rgba(0,0,0,0.45); border:1px solid var(--rail); overflow:hidden;
+  }
+  .vt-zone{position:absolute; top:0; bottom:0; background:rgba(201,162,75,0.45); border-left:1px solid var(--gold); border-right:1px solid var(--gold);}
+  .vt-marker{position:absolute; top:2px; bottom:2px; width:5px; border-radius:3px; background:var(--cream); box-shadow:0 0 8px rgba(255,255,255,0.7);}
+  .vt-pins{display:flex; gap:6px;}
+  .vt-pin{width:11px; height:11px; border-radius:50%; background:rgba(255,255,255,0.15);}
+  .vt-pin.set{background:var(--win);}
+
   /* ---- desktop scaling: bigger cards & wider felts on large screens ---- */
   @media (min-width:760px){
     .card{width:78px; height:110px; font-size:24px; border-radius:8px;}
@@ -430,6 +506,15 @@
     .vt-hint{font-size:12px;}
     .vt-table{gap:9px;}
     .vt-choices{gap:12px;}
+    .vt-chip{font-size:15px; padding:12px 18px;}
+    .vt-slotbox{width:42px; height:52px; font-size:24px;}
+    .vt-tilebtn{width:48px; height:58px; font-size:23px;}
+    .vt-simon{grid-template-columns:repeat(2, 110px);}
+    .vt-spad{height:88px; font-size:32px;}
+    .vt-lock{max-width:460px;}
+    .vt-pad{grid-template-columns:repeat(3, 76px);}
+    .vt-key{height:54px; font-size:21px;}
+    .vt-code{font-size:42px;}
   }
 </style>
 </head>
@@ -490,7 +575,7 @@
         <div class="suits">&#9827;&#9824;&#9827;</div>
         <div class="tag">Puzzle Gauntlet &middot; 30 Floors</div>
         <h2>The Vault</h2>
-        <p>Ten locked gates stand between you and the next floor down. Solve the card puzzle to pass &mdash; three misses and the floor resets.</p>
+        <p>Ten gates between you and the next floor down: picks, dials, wires, codes, words. Three misses and the floor resets.</p>
         <div class="best" id="hub-vault-best">Floor: &mdash;</div>
       </div>
     </div>
@@ -1653,8 +1738,9 @@ const Vault = (function(){
   const FLOORS = 30, GATES = 10, LIVES = 3;
   let phase;            // 'select' | 'peek' | 'question' | 'feedback' | 'floorclear' | 'floorfail'
   let floor, gate, lives, puzzle;
-  let chosenIdx, wasCorrect, reward;
+  let chosenIdx, wasCorrect, reward, failNote;
   let timerToken = 0;   // invalidates stale peek/feedback timers
+  let activeTimers = [], lastType = null, forcedType = null;
 
   /* ---- generation helpers ----
      Puzzle math uses card values A=1, J=11, Q=12, K=13.
@@ -1662,10 +1748,16 @@ const Vault = (function(){
   function rnd(n){ return Math.floor(Math.random()*n); }
   function pick(arr){ return arr[rnd(arr.length)]; }
   function mkCardV(v, suit){ return {rank: v===1 ? 14 : v, suit: suit || SUITS[rnd(4)]}; }
+  function regT(id){ activeTimers.push(id); return id; }
+  function clearTimers(){
+    activeTimers.forEach(id=>{ clearTimeout(id); clearInterval(id); });
+    activeTimers = [];
+  }
 
   // Effective difficulty: the floor sets the base, late gates tighten the screws.
   function effLevel(){ return floor + (gate>=6 ? 1 : 0) + (gate>=9 ? 1 : 0); }
 
+  /* ================= CARD GATES ================= */
   function genSum(L){
     const nBase = Math.min(2 + Math.floor(L/8), 5);
     const nCh = Math.min(3 + Math.floor(L/6), 6);
@@ -1677,7 +1769,6 @@ const Vault = (function(){
     const vals = new Set([correct]);
     let guard = 0;
     while(vals.size < nCh && guard++ < 200){
-      // late floors use near-miss decoys so you can't eyeball it
       const d = L >= 10 ? correct + (rnd(7) - 3) : 1 + rnd(13);
       if(d >= 1 && d <= 13) vals.add(d);
     }
@@ -1703,7 +1794,7 @@ const Vault = (function(){
       for(let i=0;i<4;i++){ t += steps[i%2]; if(t<1 || t>13){ ok=false; break; } }
       if(ok) starts.push(t0);
     }
-    if(starts.length===0){ steps=[1,1]; starts=[1,2,3,4,5,6,7,8,9]; } // safety net: no valid start fits in A..K
+    if(starts.length===0){ steps=[1,1]; starts=[1,2,3,4,5,6,7,8,9]; } // safety net
     let seq = [pick(starts)];
     for(let i=0;i<4;i++){ seq.push(seq[seq.length-1] + steps[i%2]); }
     const correct = seq[4];
@@ -1729,15 +1820,11 @@ const Vault = (function(){
     if(L>=6) modes.push('suit');
     if(L>=14) modes.push('parity');
     if(L>=20) modes.push('face');
-    const mode = pick(modes.slice(L>=14 ? 1 : 0)); // drop the easiest mode once harder ones exist
+    const mode = pick(modes.slice(L>=14 ? 1 : 0));
     const cards = [];
     if(mode==='color' || mode==='suit'){
-      // majority ranks: number cards with mixed parity so parity can't be a red herring
       const majRanks = [];
-      while(majRanks.length < n-1){
-        const v = 2 + rnd(9);
-        majRanks.push(v);
-      }
+      while(majRanks.length < n-1){ majRanks.push(2 + rnd(9)); }
       if(majRanks.every(v=>v%2===0)) majRanks[0] = 3;
       if(majRanks.every(v=>v%2===1)) majRanks[0] = 4;
       if(mode==='color'){
@@ -1748,21 +1835,19 @@ const Vault = (function(){
         cards.push(mkCardV(2+rnd(9), pick(oddSuits)));
       } else {
         const suit = pick(SUITS);
-        // late floors: the stray card is the SAME color, different suit — subtle
         const sameColor = {H:'D', D:'H', S:'C', C:'S'};
         const oddSuit = L>=16 ? sameColor[suit] : pick(SUITS.filter(s=>s!==suit && !(L<16 && sameColor[suit]===s)));
         majRanks.forEach(v=> cards.push(mkCardV(v, suit)));
         cards.push(mkCardV(2+rnd(9), oddSuit));
       }
     } else if(mode==='parity'){
-      // one suit only, so rank parity is the only signal
       const suit = pick(SUITS);
       const evens = [2,4,6,8,10,12], odds = [3,5,7,9,11,13];
       const majEven = rnd(2)===0;
       const majPool = shuffle(majEven ? evens : odds).slice(0, n-1);
       majPool.forEach(v=> cards.push(mkCardV(v, suit)));
       cards.push(mkCardV(pick(majEven ? odds : evens), suit));
-    } else { // face: all faces plus one number card, stray suit must not be unique
+    } else {
       const faceRanks = [11,12,13];
       const suitsUsed = [];
       for(let i=0;i<n-1;i++){ const s = pick(SUITS); suitsUsed.push(s); cards.push(mkCardV(pick(faceRanks), s)); }
@@ -1781,7 +1866,6 @@ const Vault = (function(){
   function genFlash(L){
     const n = Math.min(3 + Math.floor(L/7), 7);
     const peekMs = Math.max(4000 - L*100, 1500);
-    // distinct ranks everywhere so recall is about the cards, not suit trickery
     const allVals = shuffle([1,2,3,4,5,6,7,8,9,10,11,12,13]);
     const shownVals = allVals.slice(0, n);
     const hiddenVals = allVals.slice(n);
@@ -1806,17 +1890,374 @@ const Vault = (function(){
     };
   }
 
+  /* ================= WORD GATES ================= */
+  const ANAGRAMS = {
+    4:['ACES','BETS','CARD','CHIP','COIN','DEAL','DICE','DOOR','DRAW','FOLD','GAME','GATE','GOLD','HAND','KEYS','KING','LOCK','LUCK','RISK','RUIN','SAFE','SUIT','DARK','VEIL'],
+    5:['BLUFF','CHIPS','FLUSH','GREED','HEIST','JOKER','LUCKY','MONEY','PENNY','QUEEN','RAISE','ROYAL','STACK','STAKE','TABLE','TRICK','VAULT','WAGER','DEUCE','ANGLE'],
+    6:['BANKER','CASINO','CIPHER','DEALER','ESCAPE','GAMBLE','GOLDEN','MARKER','PALACE','POCKET','RIDDLE','SECRET','SHADOW','SILVER','TUNNEL','WINNER'],
+    7:['CABINET','DIAMOND','EMERALD','FORTUNE','JACKPOT','LANTERN','MYSTERY','PASSAGE','SHUFFLE','VENTURE','CRACKED','WHISPER'],
+    8:['BACCARAT','CORRIDOR','GAUNTLET','PASSWORD','ROULETTE','SAPPHIRE','SKELETON','TREASURE'],
+  };
+  function sortedLetters(w){ return w.split('').sort().join(''); }
+
+  function genAnagram(L){
+    const len = Math.min(4 + Math.floor(L/6), 8);
+    const list = ANAGRAMS[len];
+    const word = pick(list);
+    let letters = shuffle(word.split(''));
+    let guard = 0;
+    while(letters.join('')===word && guard++ < 20){ letters = shuffle(word.split('')); }
+    const acceptable = list.filter(w=> sortedLetters(w)===sortedLetters(word));
+    const p = {
+      type:'anagram', custom:true,
+      prompt:'The lock takes a word. Unscramble the tiles.',
+      hint:'parlor words',
+      _d:{word},
+      mount(el){
+        let chosenTiles = []; // indices into letters
+        el.innerHTML = `
+          <div class="vt-slots">${letters.map(()=>'<div class="vt-slotbox"></div>').join('')}</div>
+          <div class="vt-tiles">${letters.map((ch,i)=>`<button class="vt-tilebtn" data-i="${i}" data-l="${ch}">${ch}</button>`).join('')}</div>
+          <div class="btn-row" style="margin-top:8px;">
+            <button class="btn" id="vt-ana-back">&#9003;</button>
+            <button class="btn" id="vt-ana-clear">Clear</button>
+            <button class="btn primary" id="vt-ana-sub" disabled>Try It</button>
+          </div>`;
+        const slots = [...el.querySelectorAll('.vt-slotbox')];
+        const tiles = [...el.querySelectorAll('.vt-tilebtn')];
+        const subB = el.querySelector('#vt-ana-sub');
+        function refresh(){
+          slots.forEach((s,i)=> s.textContent = chosenTiles[i]!==undefined ? letters[chosenTiles[i]] : '');
+          tiles.forEach((t,i)=> t.disabled = chosenTiles.includes(i));
+          subB.disabled = chosenTiles.length !== letters.length;
+        }
+        tiles.forEach(t=> t.addEventListener('click', ()=>{
+          const i = parseInt(t.dataset.i,10);
+          if(!chosenTiles.includes(i) && chosenTiles.length < letters.length){ chosenTiles.push(i); refresh(); }
+        }));
+        el.querySelector('#vt-ana-back').addEventListener('click', ()=>{ chosenTiles.pop(); refresh(); });
+        el.querySelector('#vt-ana-clear').addEventListener('click', ()=>{ chosenTiles = []; refresh(); });
+        subB.addEventListener('click', ()=>{
+          const attempt = chosenTiles.map(i=>letters[i]).join('');
+          if(acceptable.includes(attempt)){ solveGate(); }
+          else { failNote = `It unscrambled to &ldquo;${word}&rdquo;.`; missGate(); }
+        });
+        refresh();
+      },
+    };
+    return p;
+  }
+
+  const WORDODD = [
+    // tier 0 — blatant
+    {t:0, w:['HEART','SPADE','CLUB','DIAMOND'], odd:'HAMMER', why:'the rest are suits'},
+    {t:0, w:['POKER','RUMMY','BRIDGE','HEARTS'], odd:'SOCCER', why:'the rest are card games'},
+    {t:0, w:['CHIP','TOKEN','COIN','MARKER'], odd:'PILLOW', why:'the rest get wagered'},
+    {t:0, w:['KING','QUEEN','JACK','ACE'], odd:'PAWN', why:'pawns live on a chessboard'},
+    {t:0, w:['DEALER','CROUPIER','BANKER','PITBOSS'], odd:'PLUMBER', why:'the rest run the tables'},
+    {t:0, w:['CHERRY','LEMON','PLUM','GRAPE'], odd:'WRENCH', why:'the rest are slot fruit'},
+    // tier 1 — takes a beat
+    {t:1, w:['FLUSH','STRAIGHT','PAIR','TRIPS'], odd:'CHECKMATE', why:'the rest are poker hands'},
+    {t:1, w:['SHUFFLE','CUT','DEAL','DRAW'], odd:'CASTLE', why:'castling is chess'},
+    {t:1, w:['VAULT','SAFE','LOCKBOX','STRONGROOM'], odd:'HAMMOCK', why:'the rest hold valuables'},
+    {t:1, w:['BLUFF','TELL','FOLD','RAISE'], odd:'SERVE', why:'serving is for tennis'},
+    {t:1, w:['COPPER','IRON','SILVER','GOLD'], odd:'GRANITE', why:'granite is stone, not metal'},
+    {t:1, w:['CEDAR','OAK','MAPLE','BIRCH'], odd:'TULIP', why:'a tulip is no tree'},
+    // tier 2 — subtle
+    {t:2, w:['TEN','JACK','QUEEN','KING'], odd:'NINE', why:'nine breaks the broadway run'},
+    {t:2, w:['EIGHT','SIX','FOUR','TWO'], odd:'SEVEN', why:'the only odd number'},
+    {t:2, w:['SECOND','MINUTE','HOUR','DAY'], odd:'METER', why:'meters measure distance, not time'},
+    {t:2, w:['TOKYO','PARIS','CAIRO','OTTAWA'], odd:'SYDNEY', why:'the only one that isn&rsquo;t a capital'},
+    {t:2, w:['EMERALD','RUBY','SAPPHIRE','TOPAZ'], odd:'PEARL', why:'pearls come from oysters, not the earth'},
+    {t:2, w:['STRAIGHT','FLUSH','BOAT','QUADS'], odd:'KICKER', why:'a kicker is no made hand'},
+  ];
+
+  function genWordOdd(L){
+    const tier = L<8 ? 0 : (L<18 ? 1 : 2);
+    const set = pick(WORDODD.filter(s=>s.t===tier));
+    const opts = shuffle(set.w.map(w=>({label:w, correct:false})).concat([{label:set.odd, correct:true}]));
+    return {
+      type:'wordodd', textChoices:true,
+      prompt:'One of these words doesn’t belong. Tap it.',
+      hint:'think it through',
+      failWhy:`(${set.why})`,
+      choices: opts,
+    };
+  }
+
+  /* ================= MACHINE GATES ================= */
+  const WIRE_COLORS = [['RED','#c0392b'],['BLUE','#2e6da4'],['GOLD','#c9a24b'],['GREEN','#4a8f4f'],['VIOLET','#8e6bb5'],['TEAL','#3a8f8a']];
+
+  function genWires(L){
+    const n = Math.min(3 + Math.floor(L/7), 6);
+    const variant = L<8 ? 'color' : (L<16 ? 'stroop' : 'sum14');
+    let left = [], right = [], promptTxt, hintTxt;
+    if(variant==='sum14'){
+      const vals = shuffle([1,2,3,4,5,6,7,8,9,10,11,12,13]).slice(0,n);
+      left = vals.map(v=>({key:Math.min(v,14-v), html:cardHtml(mkCardV(v),{cls:'sm'})}));
+      right = shuffle(vals.map(v=>({key:Math.min(v,14-v), html:cardHtml(mkCardV(14-v),{cls:'sm'})})));
+      promptTxt = 'Wire each card to its partner so every pair totals <b>14</b>.';
+      hintTxt = 'A=1 · J=11 · Q=12 · K=13';
+    } else {
+      const colors = shuffle(WIRE_COLORS.slice()).slice(0,n);
+      if(variant==='color'){
+        left = colors.map(c=>({key:c[0], html:`<span class="dot" style="background:${c[1]}"></span>`}));
+      } else {
+        // stroop: the WORD names the wire; the ink lies
+        left = colors.map((c,i)=>{
+          const ink = colors[(i+1)%n][1];
+          return {key:c[0], html:`<span style="color:${ink}; font-weight:700;">${c[0]}</span>`};
+        });
+      }
+      right = shuffle(colors.map(c=>({key:c[0], html:`<span class="dot" style="background:${c[1]}"></span>`})));
+      promptTxt = variant==='stroop'
+        ? 'Connect each <b>word</b> to its color. Ignore the ink — it lies.'
+        : 'Connect the matching wires to power the gate.';
+      hintTxt = variant==='stroop' ? 'read, don’t look' : 'left, then right';
+    }
+    return {
+      type:'wires', custom:true,
+      prompt:promptTxt, hint:hintTxt,
+      _d:{pairs:left.map(x=>x.key), rightKeys:right.map(x=>x.key)},
+      mount(el){
+        let sel = null, done = 0;
+        el.innerHTML = `
+          <div class="vt-wires">
+            <div class="vt-wcol">${left.map((w,i)=>`<button class="vt-wire" data-side="l" data-i="${i}" data-key="${w.key}">${w.html}</button>`).join('')}</div>
+            <div class="vt-wcol">${right.map((w,i)=>`<button class="vt-wire" data-side="r" data-i="${i}" data-key="${w.key}">${w.html}</button>`).join('')}</div>
+          </div>
+          <div class="vt-sub" id="vt-wire-st">connect ${n} pairs &middot; a wrong splice sparks</div>`;
+        const lbs = [...el.querySelectorAll('.vt-wire[data-side="l"]')];
+        const rbs = [...el.querySelectorAll('.vt-wire[data-side="r"]')];
+        lbs.forEach(b=> b.addEventListener('click', ()=>{
+          if(b.classList.contains('done')) return;
+          lbs.forEach(x=>x.classList.remove('sel'));
+          b.classList.add('sel'); sel = b;
+        }));
+        rbs.forEach(b=> b.addEventListener('click', ()=>{
+          if(b.classList.contains('done') || !sel) return;
+          if(b.dataset.key === sel.dataset.key){
+            b.classList.add('done'); sel.classList.add('done'); sel.classList.remove('sel');
+            sel = null; done++;
+            el.querySelector('#vt-wire-st').innerHTML = done===n ? 'the lights hum on' : `${n-done} pair${n-done>1?'s':''} to go`;
+            if(done===n) solveGate();
+          } else {
+            failNote = 'Crossed wires — sparks fly.';
+            missGate();
+          }
+        }));
+      },
+    };
+  }
+
+  function genKeypad(L){
+    const len = Math.min(3 + Math.floor(L/6), 7);
+    const peekMs = Math.max(2600 - L*60, 1200);
+    let code = '';
+    for(let i=0;i<len;i++){ code += String(rnd(10)); }
+    return {
+      type:'keypad', custom:true,
+      peekText: code.split('').join(' '), peekMs,
+      prompt:'Enter the code.',
+      hint:'from memory',
+      _d:{code},
+      mount(el){
+        let entry = '';
+        el.innerHTML = `
+          <div class="vt-entry" id="vt-kp-entry">&nbsp;</div>
+          <div class="vt-pad">
+            ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="vt-key" data-d="${d}">${d}</button>`).join('')}
+            <button class="vt-key" id="vt-kp-back">&#9003;</button>
+            <button class="vt-key" data-d="0">0</button>
+            <span></span>
+          </div>`;
+        const disp = el.querySelector('#vt-kp-entry');
+        function show(){ disp.textContent = entry.length ? entry.split('').join(' ') : ' '; }
+        el.querySelectorAll('.vt-key[data-d]').forEach(k=> k.addEventListener('click', ()=>{
+          if(entry.length >= len) return;
+          entry += k.dataset.d; show();
+          if(entry.length === len){
+            if(entry === code){ solveGate(); }
+            else { failNote = `The code was ${code.split('').join(' ')}.`; missGate(); }
+          }
+        }));
+        el.querySelector('#vt-kp-back').addEventListener('click', ()=>{ entry = entry.slice(0,-1); show(); });
+      },
+    };
+  }
+
+  function genDial(L){
+    const N = Math.min(20 + L*3, 99);
+    const secret = 1 + rnd(N);
+    const tries = Math.ceil(Math.log2(N)) + (L<8 ? 2 : (L<18 ? 1 : 0));
+    return {
+      type:'dial', custom:true,
+      prompt:`Crack the combination: a number from <b>1</b> to <b>${N}</b>.`,
+      hint:'the tumblers tell you which way to turn',
+      _d:{secret, N, tries},
+      mount(el){
+        let left = tries;
+        el.innerHTML = `
+          <div class="vt-dial">
+            <div class="cur" id="vt-dl-cur">${Math.ceil(N/2)}</div>
+            <input type="range" min="1" max="${N}" value="${Math.ceil(N/2)}" id="vt-dl-rng">
+            <div class="fb" id="vt-dl-fb">turn the dial, then try it</div>
+            <div class="vt-sub" id="vt-dl-tries">${left} tries left</div>
+            <button class="btn primary" id="vt-dl-try">Try the Handle</button>
+          </div>`;
+        const rng = el.querySelector('#vt-dl-rng'), cur = el.querySelector('#vt-dl-cur');
+        const fb = el.querySelector('#vt-dl-fb'), tr = el.querySelector('#vt-dl-tries');
+        rng.addEventListener('input', ()=>{ cur.textContent = rng.value; });
+        el.querySelector('#vt-dl-try').addEventListener('click', ()=>{
+          const g = parseInt(rng.value,10);
+          if(g === secret){ solveGate(); return; }
+          left--;
+          if(left <= 0){ failNote = `The combination was ${secret}.`; missGate(); return; }
+          fb.textContent = g < secret ? '↑ higher — the tumbler clicks' : '↓ lower — the tumbler clicks';
+          tr.textContent = `${left} tries left`;
+        });
+      },
+    };
+  }
+
+  const SIMON_PADS = [
+    {sym:'&#9824;', bg:'#2f3542'},
+    {sym:'&#9829;', bg:'#a83a31'},
+    {sym:'&#9830;', bg:'#b8923f'},
+    {sym:'&#9827;', bg:'#3f7a44'},
+  ];
+
+  function genSimon(L){
+    const len = Math.min(3 + Math.floor(L/5), 8);
+    const stepMs = Math.max(650 - L*12, 320);
+    const seq = [];
+    for(let i=0;i<len;i++){ seq.push(rnd(4)); }
+    return {
+      type:'simon', custom:true,
+      prompt:'The panel flashes a pattern. Repeat it to close the circuit.',
+      hint:`${len} flashes`,
+      _d:{seq, stepMs},
+      mount(el){
+        let idx = 0, playerTurn = false;
+        el.innerHTML = `
+          <div class="vt-simon" data-turn="watch">
+            ${SIMON_PADS.map((p,i)=>`<button class="vt-spad" data-p="${i}" style="background:${p.bg}" disabled>${p.sym}</button>`).join('')}
+          </div>
+          <div class="vt-sub" id="vt-si-st">watch the panel&hellip;</div>`;
+        const wrap = el.querySelector('.vt-simon');
+        const pads = [...el.querySelectorAll('.vt-spad')];
+        const st = el.querySelector('#vt-si-st');
+        function flash(i, ms){
+          pads[i].classList.add('lit');
+          regT(setTimeout(()=> pads[i].classList.remove('lit'), ms));
+        }
+        let step = 0;
+        const player = ()=>{
+          playerTurn = true;
+          wrap.dataset.turn = 'player';
+          pads.forEach(p=> p.disabled = false);
+          st.textContent = 'your turn';
+        };
+        const iv = setInterval(()=>{
+          if(step < seq.length){ flash(seq[step], stepMs*0.6); step++; }
+          else { clearInterval(iv); player(); }
+        }, stepMs);
+        regT(iv);
+        pads.forEach(p=> p.addEventListener('click', ()=>{
+          if(!playerTurn) return;
+          const i = parseInt(p.dataset.p,10);
+          flash(i, 180);
+          if(i === seq[idx]){
+            idx++;
+            st.textContent = `${idx} / ${seq.length}`;
+            if(idx === seq.length){ playerTurn = false; solveGate(); }
+          } else {
+            playerTurn = false;
+            failNote = 'The lights die.';
+            missGate();
+          }
+        }));
+      },
+    };
+  }
+
+  function genLockpick(L){
+    const pins = Math.min(3 + Math.floor(L/8), 6);
+    const half = Math.max(11 - L*0.25, 4.5);       // sweet-spot half-width, % of track
+    const period = Math.max(1500 - L*25, 750);      // one full sweep, ms
+    return {
+      type:'lockpick', custom:true,
+      prompt:`Set <b>${pins}</b> pins. Strike while the pick is in the gold.`,
+      hint:'one slip loses the lock',
+      _d:{pins, half, period},
+      mount(el){
+        let set = 0, pos = 2, t = 0, center = 20 + rnd(61);
+        el.innerHTML = `
+          <div class="vt-lock">
+            <div class="vt-pins">${Array(pins).fill(0).map(()=>'<span class="vt-pin"></span>').join('')}</div>
+            <div class="vt-track">
+              <div class="vt-zone" id="vt-lp-zone"></div>
+              <div class="vt-marker" id="vt-lp-mark"></div>
+            </div>
+            <button class="btn primary" id="vt-lp-set">Set Pin</button>
+          </div>`;
+        const zone = el.querySelector('#vt-lp-zone'), mark = el.querySelector('#vt-lp-mark');
+        const pinEls = [...el.querySelectorAll('.vt-pin')];
+        function placeZone(){
+          zone.style.left = (center - half) + '%';
+          zone.style.width = (half*2) + '%';
+        }
+        placeZone();
+        regT(setInterval(()=>{
+          t += 25;
+          pos = 2 + 96 * (0.5 + 0.5 * Math.sin(2*Math.PI*t/(2*period)));
+          mark.style.left = pos + '%';
+          mark.dataset.pos = pos.toFixed(1);
+        }, 25));
+        el.querySelector('#vt-lp-set').addEventListener('click', ()=>{
+          if(Math.abs(pos - center) <= half){
+            pinEls[set].classList.add('set');
+            set++;
+            if(set === pins){ solveGate(); return; }
+            center = 20 + rnd(61);
+            placeZone();
+          } else {
+            failNote = 'The pick slips.';
+            missGate();
+          }
+        });
+      },
+    };
+  }
+
+  /* ================= GATE SCHEDULING ================= */
+  const GEN = {
+    sum:genSum, seq:genSeq, odd:genOdd, flash:genFlash,
+    anagram:genAnagram, wordodd:genWordOdd,
+    wires:genWires, keypad:genKeypad, dial:genDial, simon:genSimon, lockpick:genLockpick,
+  };
+
+  function typePool(){
+    // interactive gates get double weight so the card quizzes stay the seasoning, not the meal
+    let pool = ['sum','seq','odd','wordodd','wires','wires','anagram','anagram'];
+    if(floor>=2) pool.push('dial','dial');
+    if(floor>=3) pool.push('keypad');
+    if(floor>=4) pool.push('simon','simon','flash');
+    if(floor>=5) pool.push('lockpick','lockpick');
+    return pool;
+  }
+
   function newPuzzle(){
+    clearTimers();
     const L = effLevel();
-    const types = ['sum','seq','odd'];
-    if(floor>=2 || gate>=4) types.push('flash');
-    const t = pick(types);
-    puzzle = t==='sum' ? genSum(L) : t==='seq' ? genSeq(L) : t==='odd' ? genOdd(L) : genFlash(L);
-    chosenIdx = -1; wasCorrect = false;
-    if(puzzle.type==='flash'){
+    let t = forcedType || pick(typePool().filter(x=>x!==lastType));
+    lastType = t;
+    puzzle = GEN[t](L);
+    chosenIdx = -1; wasCorrect = false; failNote = '';
+    if(puzzle.peekCards || puzzle.peekText){
       phase = 'peek';
       const tok = ++timerToken;
-      setTimeout(()=>{ if(tok===timerToken && phase==='peek'){ phase='question'; render(); } }, puzzle.peekMs);
+      regT(setTimeout(()=>{ if(tok===timerToken && phase==='peek'){ phase='question'; render(); } }, puzzle.peekMs));
     } else {
       phase = 'question';
     }
@@ -1824,14 +2265,12 @@ const Vault = (function(){
   }
 
   function startFloor(f){
-    floor = f; gate = 1; lives = LIVES;
+    floor = f; gate = 1; lives = LIVES; lastType = null;
     newPuzzle();
   }
 
-  function answer(i){
-    if(phase!=='question') return;
-    chosenIdx = i;
-    wasCorrect = puzzle.choices[i].correct;
+  function finishGate(){
+    clearTimers();
     phase = 'feedback';
     render();
     const tok = ++timerToken;
@@ -1855,7 +2294,18 @@ const Vault = (function(){
         if(lives<=0){ phase='floorfail'; render(); }
         else { newPuzzle(); } // fresh lock on the same gate
       }
-    }, wasCorrect ? 750 : 1100);
+    }, wasCorrect ? 750 : (failNote ? 1700 : 1100));
+  }
+
+  function solveGate(){ if(phase!=='question') return; wasCorrect = true; finishGate(); }
+  function missGate(){ if(phase!=='question') return; wasCorrect = false; finishGate(); }
+
+  function answer(i){
+    if(phase!=='question') return;
+    chosenIdx = i;
+    wasCorrect = puzzle.choices[i].correct;
+    if(!wasCorrect && puzzle.failWhy) failNote = puzzle.failWhy;
+    finishGate();
   }
 
   /* ---- rendering ---- */
@@ -1881,7 +2331,7 @@ const Vault = (function(){
   }
   function wireLeave(el){
     const lv = el.querySelector('#vt-leave');
-    if(lv) lv.addEventListener('click', ()=>{ timerToken++; phase='select'; render(); });
+    if(lv) lv.addEventListener('click', ()=>{ clearTimers(); timerToken++; phase='select'; render(); });
   }
 
   function render(){
@@ -1900,7 +2350,7 @@ const Vault = (function(){
       el.innerHTML = `
         <div class="dr-felt">
           <div class="bj-title">Pick a floor</div>
-          <div class="vt-sub">10 gates per floor &middot; 3 misses and the floor resets<br>clear a floor to unlock the next one down</div>
+          <div class="vt-sub">10 gates per floor &middot; 3 misses and the floor resets<br>locks, wires, words, codes &mdash; every gate is different</div>
           <div class="vt-grid">${tiles}</div>
         </div>`;
       el.querySelectorAll('.vt-tile[data-floor]').forEach(t=>{
@@ -1913,8 +2363,10 @@ const Vault = (function(){
       el.innerHTML = `
         <div class="dr-felt">
           ${headHtml()}
-          <div class="vt-prompt">Memorize the table&hellip;</div>
-          <div class="vt-table">${puzzle.peekCards.map(c=>cardHtml(c)).join('')}</div>
+          <div class="vt-prompt">Memorize ${puzzle.peekText ? 'the code' : 'the table'}&hellip;</div>
+          ${puzzle.peekCards
+            ? `<div class="vt-table">${puzzle.peekCards.map(c=>cardHtml(c)).join('')}</div>`
+            : `<div class="vt-code">${puzzle.peekText}</div>`}
           <div class="vt-peekbar"><div class="fill" style="animation-duration:${puzzle.peekMs}ms"></div></div>
         </div>`;
       wireLeave(el);
@@ -1949,29 +2401,41 @@ const Vault = (function(){
 
     // question / feedback
     const frozen = phase==='feedback';
-    const choicesHtml = puzzle.choices.map((ch,i)=>{
-      let cls='';
-      if(frozen){
-        if(ch.correct) cls='right';
-        else if(i===chosenIdx) cls='wrong';
-      }
-      return `<div class="vt-choice ${cls} ${frozen?'frozen':''}" data-i="${i}">${cardHtml(ch.card)}</div>`;
-    }).join('');
+    let body = '';
+    if(puzzle.custom){
+      body = frozen ? '' : `<div id="vt-custom" style="width:100%; display:flex; flex-direction:column; align-items:center;"></div>`;
+    } else if(puzzle.textChoices){
+      body = `<div class="vt-chips">${puzzle.choices.map((ch,i)=>{
+        let cls='';
+        if(frozen){ if(ch.correct) cls='right'; else if(i===chosenIdx) cls='wrong'; }
+        return `<button class="vt-chip ${cls}" data-i="${i}" ${frozen?'disabled':''}>${ch.label}</button>`;
+      }).join('')}</div>`;
+    } else {
+      body = `<div class="vt-choices">${puzzle.choices.map((ch,i)=>{
+        let cls='';
+        if(frozen){ if(ch.correct) cls='right'; else if(i===chosenIdx) cls='wrong'; }
+        return `<div class="vt-choice ${cls} ${frozen?'frozen':''}" data-i="${i}">${cardHtml(ch.card)}</div>`;
+      }).join('')}</div>`;
+    }
 
     el.innerHTML = `
       <div class="dr-felt">
         ${headHtml()}
         <div class="vt-prompt">${puzzle.prompt}</div>
         ${puzzle.tableCards ? `<div class="vt-table">${puzzle.tableCards.map(c=>cardHtml(c)).join('')}${puzzle.mystery ? cardHtml(null,{back:true}) : ''}</div>` : ''}
-        <div class="vt-choices">${choicesHtml}</div>
+        ${body}
         <div class="vt-hint">${puzzle.hint||''}</div>
-        ${frozen ? `<div class="vt-sub">${wasCorrect ? 'The lock turns.' : 'Wrong — the lock jams. New tumblers…'}</div>` : ''}
+        ${frozen ? `<div class="vt-sub">${wasCorrect ? pick(['The lock turns.','Tumblers align.','The gate grinds open.']) : 'Wrong — the lock jams. New tumblers…'} ${(!wasCorrect && failNote) ? failNote : ''}</div>` : ''}
       </div>`;
 
     if(!frozen){
-      el.querySelectorAll('.vt-choice').forEach(c=>{
-        c.addEventListener('click', ()=> answer(parseInt(c.dataset.i,10)));
-      });
+      if(puzzle.custom){
+        puzzle.mount(el.querySelector('#vt-custom'));
+      } else {
+        el.querySelectorAll('.vt-choice, .vt-chip').forEach(c=>{
+          c.addEventListener('click', ()=> answer(parseInt(c.dataset.i,10)));
+        });
+      }
     }
     wireLeave(el);
   }
@@ -1984,7 +2448,9 @@ const Vault = (function(){
   return { enter, _test: {
     state: ()=>({phase, floor, gate, lives}),
     puzzle: ()=>puzzle,
-    gen: (t,L)=> t==='sum' ? genSum(L) : t==='seq' ? genSeq(L) : t==='odd' ? genOdd(L) : genFlash(L),
+    gen: (t,L)=> GEN[t](L),
+    force: (t)=>{ forcedType = t || null; },
+    types: ()=>Object.keys(GEN),
   } };
 })();
 
