@@ -233,9 +233,61 @@
   .hd-controls{max-width:460px;}
   .hd-sub{color:var(--ink); font-size:13px; margin-bottom:16px;}
 
+  /* ---- DEAD MAN'S RUN ---- */
+  .dr-felt{
+    flex:1; width:100%; max-width:520px; margin:0 auto; padding:22px 16px 30px;
+    display:flex; flex-direction:column; align-items:center;
+    background:radial-gradient(ellipse at 50% 0%, var(--felt) 0%, var(--felt-dark) 75%);
+  }
+  .dr-hud{display:flex; gap:22px; margin-bottom:14px;}
+  .dr-run{
+    display:flex; flex-wrap:wrap; gap:5px; justify-content:center;
+    min-height:78px; max-width:440px; margin-bottom:12px;
+  }
+  .dr-run .card{width:46px; height:66px; font-size:14px;}
+  .dr-run .card.killer{
+    border:2px solid var(--red);
+    box-shadow:0 0 14px rgba(181,67,58,0.7);
+  }
+  .dr-meter{
+    width:100%; max-width:340px; margin-bottom:6px;
+  }
+  .dr-meter .track{
+    height:10px; border-radius:5px; background:rgba(0,0,0,0.4);
+    border:1px solid var(--rail); overflow:hidden;
+  }
+  .dr-meter .fill{
+    height:100%; border-radius:4px;
+    background:linear-gradient(90deg, var(--win), var(--gold) 55%, var(--red));
+    transition:width .25s ease;
+  }
+  .dr-meter .cap{
+    display:flex; justify-content:space-between; margin-top:4px;
+    font-family:var(--mono); font-size:10.5px; color:var(--ink);
+  }
+  .dr-ladder{
+    font-family:var(--mono); font-size:12px; color:var(--ink);
+    background:rgba(0,0,0,0.25); border:1px solid var(--rail);
+    border-radius:6px; padding:8px 14px; margin-bottom:14px; text-align:center;
+    line-height:1.7;
+  }
+  .dr-ladder .now{color:var(--gold); font-size:14px;}
+  .dr-ladder .next{color:var(--cream);}
+  .dr-message{
+    font-family:var(--display); font-size:17px; text-align:center; padding:9px 16px;
+    border-radius:6px; margin-bottom:12px; background:rgba(0,0,0,0.25); color:var(--cream);
+    max-width:420px;
+  }
+  .dr-message.win{color:var(--win);}
+  .dr-message.lose{color:var(--red);}
+  .dr-message.jackpot{color:var(--gold); text-shadow:0 0 12px rgba(201,162,75,0.6);}
+  .dr-sub{font-family:var(--mono); font-size:11px; color:var(--gold-dim); margin-bottom:14px; text-align:center;}
+  .dr-broke{margin-top:14px; text-align:center; font-size:13px; color:var(--ink);}
+
   @media (max-width:420px){
     .tp-slot{width:38px; height:54px;}
     .tp-slot .card{width:38px; height:54px; font-size:11px;}
+    .dr-run .card{width:40px; height:57px; font-size:12px;}
   }
 </style>
 </head>
@@ -251,7 +303,7 @@
 
   <div id="hub-screen" class="screen active">
     <div class="hub-hero">
-      <div class="eyebrow">Three tables &middot; one deck &middot; no signal required</div>
+      <div class="eyebrow">Four tables &middot; one deck &middot; no signal required</div>
       <h1>The Parlor</h1>
       <p>Offline card room. Pick a table &mdash; your chips and best scores carry over between hands.</p>
     </div>
@@ -278,12 +330,20 @@
         <p>Fast hands, real bets, double down when it's right. Beat the dealer, not the odds.</p>
         <div class="best" id="hub-blackjack-best">Chips: &mdash;</div>
       </div>
+      <div class="table-card" data-game="deadrun">
+        <div class="suits">&#9824;&#9824;</div>
+        <div class="tag">Push Your Luck &middot; Bank or Bust</div>
+        <h2>Dead Man's Run</h2>
+        <p>Ante up and flip cards one at a time. Pair a rank you've already flipped and the house takes it all &mdash; bank before the deck bites.</p>
+        <div class="best" id="hub-deadrun-best">Best haul: &mdash;</div>
+      </div>
     </div>
   </div>
 
   <div id="tripeaks-screen" class="screen"></div>
   <div id="blackjack-screen" class="screen"></div>
   <div id="holdem-screen" class="screen"></div>
+  <div id="deadrun-screen" class="screen"></div>
 
   <footer id="credits">THE PARLOR &middot; fully offline &middot; your device only</footer>
 </div>
@@ -321,6 +381,7 @@ function cardHtml(card, opts){
 const STORE_KEYS = {
   bank: 'parlor_bank',
   tripeaksBest: 'parlor_tripeaks_best',
+  deadrunBest: 'parlor_deadrun_best',
 };
 function getBank(){
   const v = localStorage.getItem(STORE_KEYS.bank);
@@ -334,6 +395,14 @@ function setBank(v){
   return v;
 }
 function addBank(delta){ return setBank(getBank()+delta); }
+
+function getDeadrunBest(){
+  const v = localStorage.getItem(STORE_KEYS.deadrunBest);
+  return v===null ? 0 : parseInt(v,10);
+}
+function setDeadrunBest(v){
+  if(v > getDeadrunBest()){ localStorage.setItem(STORE_KEYS.deadrunBest, String(v)); }
+}
 
 function getTriBest(){
   const v = localStorage.getItem(STORE_KEYS.tripeaksBest);
@@ -352,6 +421,8 @@ function refreshBankDisplay(){
   if(hubBJ) hubBJ.textContent = 'Chips: ' + getBank().toLocaleString();
   const hubTri = document.getElementById('hub-tripeaks-best');
   if(hubTri) hubTri.textContent = 'Best: ' + (getTriBest() ? getTriBest().toLocaleString() : '\u2014');
+  const hubDR = document.getElementById('hub-deadrun-best');
+  if(hubDR) hubDR.textContent = 'Best haul: ' + (getDeadrunBest() ? getDeadrunBest().toLocaleString() : '\u2014');
 }
 
 /* ---- navigation ---- */
@@ -369,15 +440,17 @@ function showScreen(name){
     bankD.classList.remove('show');
   } else {
     back.classList.add('show');
-    bankD.classList.toggle('show', name==='holdem' || name==='blackjack');
+    bankD.classList.toggle('show', name==='holdem' || name==='blackjack' || name==='deadrun');
     if(name==='tripeaks') title.textContent = 'Tri-Peaks';
     if(name==='holdem') title.textContent = "The High Table";
     if(name==='blackjack') title.textContent = 'Twenty-One';
+    if(name==='deadrun') title.textContent = "Dead Man's Run";
   }
   refreshBankDisplay();
   if(name==='tripeaks') TriPeaks.enter();
   if(name==='blackjack') Blackjack.enter();
   if(name==='holdem') Holdem.enter();
+  if(name==='deadrun') DeadRun.enter();
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -1075,6 +1148,169 @@ const Holdem = (function(){
 
   function enter(){
     if(!players){ initPlayers(); startHand(); } else { render(); }
+  }
+
+  return { enter };
+})();
+
+
+/* ================= DEAD MAN'S RUN ================= */
+const DeadRun = (function(){
+  // Payout multiplier by number of cards safely flipped. Tuned against the real
+  // bust odds (after k unique ranks, 3k of the remaining cards bust you):
+  // banking around 4-6 flips is near break-even, deeper pushes trade EV for jackpots.
+  const MULT = [0, 1, 1.1, 1.3, 1.6, 2.1, 3, 4.5, 8, 16, 40, 150, 750, 5000];
+  let deck, run, seenRanks, bet, phase, message, msgCls, killerCard, payout;
+
+  function bustOdds(){
+    // remaining copies of ranks already in the run vs cards left in the deck
+    let danger = 0;
+    for(const c of deck){ if(seenRanks.has(c.rank)) danger++; }
+    return deck.length ? danger/deck.length : 0;
+  }
+
+  function startAnte(){
+    phase = 'ante';
+    message = ''; msgCls = ''; killerCard = null; payout = 0;
+    render();
+  }
+
+  function placeAnte(amount){
+    const bank = getBank();
+    if(amount > bank) amount = bank;
+    if(amount <= 0) return;
+    bet = amount;
+    addBank(-bet);
+    deck = shuffle(buildDeck());
+    run = [];
+    seenRanks = new Set();
+    phase = 'run';
+    message = ''; msgCls = ''; killerCard = null; payout = 0;
+    flip(); // first flip can never bust — the tension starts on card two
+  }
+
+  function flip(){
+    if(phase!=='run') return;
+    const card = deck.pop();
+    if(seenRanks.has(card.rank)){
+      killerCard = card;
+      run.push(card);
+      phase = 'over';
+      message = `The ${rankStr(card.rank)}${SUIT_SYM[card.suit]} pairs your ${rankStr(card.rank)}. The house takes ${bet.toLocaleString()}.`;
+      msgCls = 'lose';
+      render();
+      return;
+    }
+    seenRanks.add(card.rank);
+    run.push(card);
+    if(run.length===13){
+      // one of every rank — a perfect run auto-banks the top of the ladder
+      payout = Math.floor(bet * MULT[13]);
+      addBank(payout);
+      setDeadrunBest(payout);
+      phase = 'over';
+      message = `A PERFECT RUN. All thirteen ranks. You take ${payout.toLocaleString()} chips.`;
+      msgCls = 'jackpot';
+      render();
+      return;
+    }
+    render();
+  }
+
+  function bankRun(){
+    if(phase!=='run' || run.length===0) return;
+    payout = Math.floor(bet * MULT[run.length]);
+    addBank(payout);
+    setDeadrunBest(payout);
+    phase = 'over';
+    const net = payout - bet;
+    message = net>0
+      ? `Banked at ${run.length} cards for ${payout.toLocaleString()} chips (+${net.toLocaleString()}).`
+      : `Banked at ${run.length} card${run.length>1?'s':''}. Your ante comes back.`;
+    msgCls = net>0 ? 'win' : '';
+    render();
+  }
+
+  function render(){
+    const el = document.getElementById('deadrun-screen');
+    if(!el) return;
+    const bank = getBank();
+
+    if(phase==='ante'){
+      const presets = [10,25,50,100];
+      el.innerHTML = `
+        <div class="dr-felt">
+          <div class="bj-title">Ante up</div>
+          <div class="bj-bank">Bank: <span class="mono">${bank.toLocaleString()}</span> chips</div>
+          <div class="dr-sub">Flip cards one at a time. Pair a rank you've already<br>flipped and your stake is gone. Bank any time.</div>
+          <div class="btn-row">
+            ${presets.map(p=>`<button class="btn dr-bet-btn" data-amt="${p}" ${p>bank?'disabled':''}>${p}</button>`).join('')}
+            <button class="btn primary" id="dr-allin" ${bank<=0?'disabled':''}>All-In (${bank})</button>
+          </div>
+          <div class="dr-ladder" style="margin-top:18px;">
+            2 cards &times;1.1 &middot; 4 &times;1.6 &middot; 6 &times;3 &middot; 8 &times;16<br>
+            10 &times;150 &middot; 12 &times;750 &middot; all 13 &times;5000
+          </div>
+          <div class="dr-sub">Best haul: ${getDeadrunBest() ? getDeadrunBest().toLocaleString()+' chips' : '&mdash;'}</div>
+          ${bank<=0 ? `<div class="dr-broke">You're out of chips. <button class="btn" id="dr-restock">Take a 500-chip marker</button></div>` : ''}
+        </div>`;
+      el.querySelectorAll('.dr-bet-btn').forEach(b=>b.addEventListener('click', ()=>placeAnte(parseInt(b.dataset.amt,10))));
+      const ai = document.getElementById('dr-allin');
+      if(ai) ai.addEventListener('click', ()=>placeAnte(bank));
+      const restock = document.getElementById('dr-restock');
+      if(restock) restock.addEventListener('click', ()=>{ addBank(500); render(); });
+      return;
+    }
+
+    const n = run.length;
+    const busted = phase==='over' && killerCard;
+    const odds = phase==='run' ? bustOdds() : 0;
+    const oddsPct = Math.round(odds*100);
+    const nowMult = MULT[Math.min(n,13)];
+    const nextMult = n<13 ? MULT[n+1] : null;
+    const nowPay = Math.floor(bet*nowMult);
+    const nextPay = nextMult!==null ? Math.floor(bet*nextMult) : null;
+
+    const runHtml = run.map((c,i)=>
+      cardHtml(c, {cls: (busted && i===run.length-1) ? 'killer' : ''})
+    ).join('');
+
+    el.innerHTML = `
+      <div class="dr-felt">
+        <div class="dr-hud">
+          <div class="tp-stat"><span class="lbl">Ante</span><span class="val">${bet.toLocaleString()}</span></div>
+          <div class="tp-stat"><span class="lbl">Cards</span><span class="val">${busted ? n-1 : n}</span></div>
+          <div class="tp-stat"><span class="lbl">On the line</span><span class="val">${(phase==='over' ? payout : nowPay).toLocaleString()}</span></div>
+        </div>
+        <div class="dr-run">${runHtml}</div>
+        ${phase==='run' ? `
+          <div class="dr-meter">
+            <div class="track"><div class="fill" style="width:${Math.max(oddsPct,3)}%"></div></div>
+            <div class="cap"><span>next flip busts</span><span>${oddsPct}%</span></div>
+          </div>
+          <div class="dr-ladder">
+            bank now <span class="now">&times;${nowMult} = ${nowPay.toLocaleString()}</span><br>
+            survive one more <span class="next">&times;${nextMult} = ${nextPay.toLocaleString()}</span>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" id="dr-flip">Flip (${oddsPct}% bust)</button>
+            <button class="btn" id="dr-bank">Bank ${nowPay.toLocaleString()}</button>
+          </div>
+        ` : `
+          <div class="dr-message ${msgCls}">${message}</div>
+          <div class="btn-row">
+            <button class="btn primary" id="dr-again">Run It Again</button>
+          </div>
+        `}
+      </div>`;
+
+    const flipB = document.getElementById('dr-flip'); if(flipB) flipB.addEventListener('click', flip);
+    const bankB = document.getElementById('dr-bank'); if(bankB) bankB.addEventListener('click', bankRun);
+    const againB = document.getElementById('dr-again'); if(againB) againB.addEventListener('click', startAnte);
+  }
+
+  function enter(){
+    if(!phase){ startAnte(); } else { render(); }
   }
 
   return { enter };
