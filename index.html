@@ -472,10 +472,20 @@
   .cs-cell.gem-1{background:radial-gradient(circle at 35% 30%, #e0b95c, #96702c);}
   .cs-cell.gem-2{background:radial-gradient(circle at 35% 30%, #5ba063, #2e5f33);}
   .cs-cell.gem-3{background:radial-gradient(circle at 35% 30%, #4a82b4, #1f4468);}
-  .cs-cell.clearing{animation:csPop .3s ease forwards;}
-  @keyframes csPop{to{transform:scale(0.1); opacity:0;}}
+  .cs-cell.gem-4{background:radial-gradient(circle at 35% 30%, #e8d48a, #a37e2c); color:#fff;}
+  .cs-cell.clearing{animation:csPop .32s ease forwards;}
+  @keyframes csPop{50%{transform:scale(1.18); filter:brightness(1.8);} to{transform:scale(0.1); opacity:0;}}
+  .cs-cell.land{animation:csLand .28s ease;}
+  @keyframes csLand{0%{transform:translateY(-10px) scale(1.06);} 60%{transform:translateY(2px) scale(0.97);} 100%{transform:none;}}
   .cs-cell.ghost-ok{box-shadow:inset 0 0 0 2px var(--win); background-color:rgba(111,174,106,0.28);}
-  .cs-cell.ghost-bad{box-shadow:inset 0 0 0 2px var(--red); background-color:rgba(181,67,58,0.22);}
+  .cs-popup{
+    position:absolute; left:50%; top:34%; transform:translateX(-50%);
+    font-family:var(--display); font-size:26px; font-weight:700; color:var(--gold);
+    text-shadow:0 2px 10px rgba(0,0,0,0.8); pointer-events:none; z-index:6; text-align:center;
+    animation:csFloat .95s ease-out forwards;
+  }
+  .cs-popup .sub{font-family:var(--mono); font-size:13px; letter-spacing:2px; color:var(--cream); margin-top:2px;}
+  @keyframes csFloat{from{opacity:1;} 70%{opacity:1;} to{opacity:0; transform:translateX(-50%) translateY(-52px);}}
   .cs-tray{
     display:flex; gap:20px; margin-top:18px; align-items:center; justify-content:center;
     min-height:96px; flex-wrap:wrap;
@@ -490,7 +500,9 @@
   .cs-piece .pc.gem-1{background:radial-gradient(circle at 35% 30%, #e0b95c, #96702c);}
   .cs-piece .pc.gem-2{background:radial-gradient(circle at 35% 30%, #5ba063, #2e5f33);}
   .cs-piece .pc.gem-3{background:radial-gradient(circle at 35% 30%, #4a82b4, #1f4468);}
+  .cs-piece .pc.gem-4{background:radial-gradient(circle at 35% 30%, #e8d48a, #a37e2c);}
   .cs-piece .pc.empty{background:transparent;}
+  .cs-piece.dead{opacity:0.3; border-color:var(--red);}
   .cs-slot-empty{width:60px; height:60px; border-radius:8px; border:1px dashed var(--rail); opacity:0.4;}
   .cs-over{
     margin-top:16px; text-align:center; background:var(--felt-dark); border:1px solid var(--gold-dim);
@@ -638,7 +650,7 @@
         <div class="suits">&#9829;&#9830;&#9827;&#9824;</div>
         <div class="tag">Gems &amp; Blocks &middot; Endless</div>
         <h2>Cascade</h2>
-        <p>Place gem blocks on the board. Fill a row or column to clear it, pool six of a suit to pop them &mdash; and let the cascades chain.</p>
+        <p>Drop gem blocks down the well, tetris-style. Full rows burst, six of a suit pop, and the falling rubble chains into cascades.</p>
         <div class="best" id="hub-cascade-best">Best: &mdash;</div>
       </div>
     </div>
@@ -2532,12 +2544,12 @@ const Vault = (function(){
 })();
 
 
-/* ================= CASCADE (gem blocks) ================= */
+/* ================= CASCADE (gem drop) ================= */
 const Cascade = (function(){
-  const W = 8, H = 8, POPMIN = 6, NCOLORS = 4;
-  const GEM_SYMS = ['&#9829;','&#9830;','&#9827;','&#9824;'];
-  // Block Blast / Tetris piece vocabulary as [row,col] offsets (no rotation in play;
-  // rotated variants are separate entries in the pool)
+  const W = 8, H = 10, POPMIN = 6, NCOLORS = 4, WILD = 4;
+  const GEM_SYMS = ['&#9829;','&#9830;','&#9827;','&#9824;','&#9733;'];
+  // Tetris/Block Blast piece vocabulary as [row,col] offsets; rotations are
+  // separate pool entries — you play the shape you're dealt.
   const SHAPES = [
     [[0,0]],
     [[0,0],[0,1]], [[0,0],[1,0]],
@@ -2548,62 +2560,78 @@ const Cascade = (function(){
     [[0,0],[0,1],[0,2],[1,1]], [[1,0],[0,1],[1,1],[1,2]], [[0,0],[1,0],[2,0],[1,1]], [[0,1],[1,0],[1,1],[2,1]],
     [[0,1],[0,2],[1,0],[1,1]], [[0,0],[0,1],[1,1],[1,2]],
     [[0,0],[1,0],[2,0],[2,1]], [[0,1],[1,1],[2,0],[2,1]], [[0,0],[0,1],[1,0],[2,0]], [[0,0],[0,1],[1,1],[2,1]],
-    [[0,0],[0,1],[0,2],[0,3],[0,4]], [[0,0],[1,0],[2,0],[3,0],[4,0]],
+    [[0,0],[0,1],[0,2],[0,3],[0,4]],
     [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], [[0,0],[0,1],[1,0],[1,1],[2,0],[2,1]],
-    [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]],
     [[0,0],[0,1],[0,2],[1,0],[2,0]], [[0,0],[0,1],[0,2],[1,2],[2,2]],
   ];
-  let grid, tray, selected, score, streak, over, resolving, clearingSet, lastChips, started;
+  let grid, tray, selected, score, streak, over, resolving, clearingSet, landedSet, lastChips, started;
   let rTok = 0;
 
   function rnd(n){ return Math.floor(Math.random()*n); }
   function idx(r,c){ return r*W + c; }
-  function rndPiece(){ return {shape: SHAPES[rnd(SHAPES.length)], color: rnd(NCOLORS)}; }
+  function rndPiece(){
+    if(Math.random() < 0.08) return {shape:[[0,0]], color:WILD}; // wild star, always a single
+    return {shape: SHAPES[rnd(SHAPES.length)], color: rnd(NCOLORS)};
+  }
 
   function newGame(){
     grid = Array(W*H).fill(null);
     tray = [rndPiece(), rndPiece(), rndPiece()];
     selected = -1; score = 0; streak = 0; over = false; resolving = false;
-    clearingSet = null; lastChips = 0; started = true;
+    clearingSet = null; landedSet = null; lastChips = 0; started = true;
     rTok++;
     render();
   }
 
-  function cellsFor(shape, r0, c0){ return shape.map(([dr,dc])=>[r0+dr, c0+dc]); }
-  function canPlaceAt(shape, r0, c0){
-    return cellsFor(shape, r0, c0).every(([r,c])=> r>=0 && r<H && c>=0 && c<W && grid[idx(r,c)]===null);
+  /* ---- rigid Tetris drop: the piece enters at the top of the chosen columns
+     and falls until it hits the stack. Overhangs leave real holes. ---- */
+  function maxC(shape){ return Math.max(...shape.map(x=>x[1])); }
+  function maxR(shape){ return Math.max(...shape.map(x=>x[0])); }
+  function clampCol(shape, col){ return Math.max(0, Math.min(col, W-1-maxC(shape))); }
+  function landingShift(shape, col){
+    if(col<0 || col+maxC(shape) > W-1) return -1;
+    const mR = maxR(shape);
+    const fits = s => shape.every(([dr,dc])=>{
+      const r = dr+s;
+      return r>=0 && r<H && grid[idx(r, col+dc)]===null;
+    });
+    if(!fits(0)) return -1; // no room to enter at the top
+    let s = 0;
+    while(s+1 <= H-1-mR && fits(s+1)) s++;
+    return s;
   }
-  function canFitAnywhere(shape){
-    for(let r=0;r<H;r++){ for(let c=0;c<W;c++){ if(canPlaceAt(shape,r,c)) return true; } }
+  function canDropAnywhere(shape){
+    for(let c=0; c<=W-1-maxC(shape); c++){ if(landingShift(shape, c)>=0) return true; }
     return false;
   }
-  function anyPieceFits(){
-    return tray.some(p=> p && canFitAnywhere(p.shape));
-  }
+  function anyPieceFits(){ return tray.some(p=> p && canDropAnywhere(p.shape)); }
 
-  function findLines(){
-    const rows=[], cols=[];
+  function findRows(){
+    const rows=[];
     for(let r=0;r<H;r++){ let full=true; for(let c=0;c<W;c++){ if(grid[idx(r,c)]===null){ full=false; break; } } if(full) rows.push(r); }
-    for(let c=0;c<W;c++){ let full=true; for(let r=0;r<H;r++){ if(grid[idx(r,c)]===null){ full=false; break; } } if(full) cols.push(c); }
-    return {rows, cols};
+    return rows;
   }
+  // per-color flood fill; wild stars join any color's group
   function findGroups(){
-    const seen = Array(W*H).fill(false), groups=[];
-    for(let i=0;i<W*H;i++){
-      if(seen[i] || grid[i]===null) continue;
-      const color = grid[i], q=[i], cells=[];
-      seen[i]=true;
-      while(q.length){
-        const cur=q.pop(); cells.push(cur);
-        const r=Math.floor(cur/W), c=cur%W;
-        [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc])=>{
-          if(nr>=0&&nr<H&&nc>=0&&nc<W){
-            const ni=idx(nr,nc);
-            if(!seen[ni] && grid[ni]===color){ seen[ni]=true; q.push(ni); }
-          }
-        });
+    const groups=[];
+    for(let color=0; color<NCOLORS; color++){
+      const seen = new Set();
+      for(let i=0;i<W*H;i++){
+        if(seen.has(i) || grid[i]!==color) continue;
+        const q=[i], cells=[];
+        seen.add(i);
+        while(q.length){
+          const cur=q.pop(); cells.push(cur);
+          const r=Math.floor(cur/W), c=cur%W;
+          [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc])=>{
+            if(nr>=0&&nr<H&&nc>=0&&nc<W){
+              const ni=idx(nr,nc);
+              if(!seen.has(ni) && (grid[ni]===color || grid[ni]===WILD)){ seen.add(ni); q.push(ni); }
+            }
+          });
+        }
+        if(cells.length>=POPMIN) groups.push(cells);
       }
-      if(cells.length>=POPMIN) groups.push(cells);
     }
     return groups;
   }
@@ -2621,27 +2649,38 @@ const Cascade = (function(){
     }
   }
 
-  // Resolve loop: clear full lines + color pops, apply gravity, repeat while
-  // new clears form. Depth and placement streak both multiply the score.
+  function showPopup(main, sub){
+    const board = document.getElementById('cs-wrap');
+    if(!board) return;
+    const d = document.createElement('div');
+    d.className = 'cs-popup';
+    d.innerHTML = `${main}${sub ? `<div class="sub">${sub}</div>` : ''}`;
+    board.appendChild(d);
+    setTimeout(()=>{ d.remove(); }, 950);
+  }
+
+  // Resolve loop: full rows burst + suit pops, wreckage falls, repeat.
+  // Cascade depth and placement streak both multiply the haul.
   function resolveBoard(streakMult, done){
     const tok = ++rTok;
     let depth = 0, cleared = false;
     function step(){
       if(tok!==rTok) return;
-      const lines = findLines();
+      const rows = findRows();
       const groups = findGroups();
       const toClear = new Set();
-      lines.rows.forEach(r=>{ for(let c=0;c<W;c++) toClear.add(idx(r,c)); });
-      lines.cols.forEach(c=>{ for(let r=0;r<H;r++) toClear.add(idx(r,c)); });
+      rows.forEach(r=>{ for(let c=0;c<W;c++) toClear.add(idx(r,c)); });
       groups.forEach(g=> g.forEach(i=> toClear.add(i)));
       if(toClear.size===0){ done(cleared); return; }
       cleared = true; depth++;
-      const nLines = lines.rows.length + lines.cols.length;
-      let pts = 100*nLines + 50*nLines*(nLines-1);
+      const nRows = rows.length;
+      let pts = 120*nRows + 60*nRows*(nRows-1);
       groups.forEach(g=>{ pts += g.length*15; });
-      pts *= Math.min(depth,5) * streakMult;
-      score += Math.round(pts);
+      pts = Math.round(pts * Math.min(depth,5) * streakMult);
+      score += pts;
+      showPopup(`+${pts.toLocaleString()}`, depth>=2 ? `CASCADE &times;${depth}` : (streakMult>1 ? `streak &times;${streakMult}` : ''));
       clearingSet = toClear;
+      landedSet = null;
       render();
       setTimeout(()=>{
         if(tok!==rTok) return;
@@ -2649,17 +2688,24 @@ const Cascade = (function(){
         clearingSet = null;
         applyGravity();
         render();
-        setTimeout(step, 190);
-      }, 300);
+        setTimeout(step, 210);
+      }, 320);
     }
     step();
   }
 
-  function place(pi, r0, c0){
+  function place(pi, col){
     if(over || resolving) return false;
     const p = tray[pi];
-    if(!p || !canPlaceAt(p.shape, r0, c0)) return false;
-    cellsFor(p.shape, r0, c0).forEach(([r,c])=>{ grid[idx(r,c)] = p.color; });
+    if(!p) return false;
+    col = clampCol(p.shape, col);
+    const s = landingShift(p.shape, col);
+    if(s<0) return false;
+    landedSet = new Set();
+    p.shape.forEach(([dr,dc])=>{
+      grid[idx(dr+s, col+dc)] = p.color;
+      landedSet.add(idx(dr+s, col+dc));
+    });
     score += p.shape.length;
     tray[pi] = null;
     selected = -1;
@@ -2669,6 +2715,7 @@ const Cascade = (function(){
     resolveBoard(streakMult, (didClear)=>{
       streak = didClear ? streak+1 : 0;
       resolving = false;
+      landedSet = null;
       if(tray.every(x=>!x)) tray = [rndPiece(), rndPiece(), rndPiece()];
       if(!anyPieceFits()){
         over = true;
@@ -2684,29 +2731,31 @@ const Cascade = (function(){
   /* ---- rendering & input ---- */
   function pieceHtml(p, i){
     if(!p) return `<div class="cs-slot-empty"></div>`;
-    const maxR = Math.max(...p.shape.map(x=>x[0])), maxC = Math.max(...p.shape.map(x=>x[1]));
-    const occupied = new Set(p.shape.map(([r,c])=> r*(maxC+1)+c));
+    const mR = maxR(p.shape), mC = maxC(p.shape);
+    const occupied = new Set(p.shape.map(([r,c])=> r*(mC+1)+c));
+    const dead = !over && !canDropAnywhere(p.shape);
     let cells='';
-    for(let r=0;r<=maxR;r++){
-      for(let c=0;c<=maxC;c++){
-        cells += `<div class="pc ${occupied.has(r*(maxC+1)+c) ? 'gem-'+p.color : 'empty'}"></div>`;
+    for(let r=0;r<=mR;r++){
+      for(let c=0;c<=mC;c++){
+        cells += `<div class="pc ${occupied.has(r*(mC+1)+c) ? 'gem-'+p.color : 'empty'}"></div>`;
       }
     }
-    return `<div class="cs-piece ${selected===i?'sel':''}" data-pi="${i}" style="grid-template-columns:repeat(${maxC+1}, 19px);">${cells}</div>`;
+    return `<div class="cs-piece ${selected===i?'sel':''} ${dead?'dead':''}" data-pi="${i}" style="grid-template-columns:repeat(${mC+1}, 19px);">${cells}</div>`;
   }
 
   function clearGhost(el){
-    el.querySelectorAll('.ghost-ok, .ghost-bad').forEach(c=> c.classList.remove('ghost-ok','ghost-bad'));
+    el.querySelectorAll('.ghost-ok').forEach(c=> c.classList.remove('ghost-ok'));
   }
-  function showGhost(el, r0, c0){
+  function showGhost(el, col){
     clearGhost(el);
     if(selected<0 || !tray[selected] || over || resolving) return;
-    const ok = canPlaceAt(tray[selected].shape, r0, c0);
-    cellsFor(tray[selected].shape, r0, c0).forEach(([r,c])=>{
-      if(r>=0&&r<H&&c>=0&&c<W){
-        const cell = el.querySelector(`.cs-cell[data-r="${r}"][data-c="${c}"]`);
-        if(cell) cell.classList.add(ok ? 'ghost-ok' : 'ghost-bad');
-      }
+    const shape = tray[selected].shape;
+    const cc = clampCol(shape, col);
+    const s = landingShift(shape, cc);
+    if(s<0) return;
+    shape.forEach(([dr,dc])=>{
+      const cell = el.querySelector(`.cs-cell[data-r="${dr+s}"][data-c="${cc+dc}"]`);
+      if(cell) cell.classList.add('ghost-ok');
     });
   }
 
@@ -2719,7 +2768,8 @@ const Cascade = (function(){
       for(let c=0;c<W;c++){
         const g = grid[idx(r,c)];
         const clearing = clearingSet && clearingSet.has(idx(r,c));
-        boardCells += `<div class="cs-cell ${g!==null?'gem-'+g:''} ${clearing?'clearing':''}" data-r="${r}" data-c="${c}">${g!==null?GEM_SYMS[g]:''}</div>`;
+        const landed = landedSet && landedSet.has(idx(r,c));
+        boardCells += `<div class="cs-cell ${g!==null?'gem-'+g:''} ${clearing?'clearing':''} ${landed?'land':''}" data-r="${r}" data-c="${c}">${g!==null?GEM_SYMS[g]:''}</div>`;
       }
     }
 
@@ -2730,16 +2780,18 @@ const Cascade = (function(){
           <div class="tp-stat"><span class="lbl">Best</span><span class="val">${Math.max(getCascadeBest(), score).toLocaleString()}</span></div>
           <div class="tp-stat"><span class="lbl">Streak</span><span class="val">x${Math.min(streak+1,5)}</span></div>
         </div>
-        <div class="cs-board" id="cs-board">${boardCells}</div>
+        <div id="cs-wrap" style="position:relative;">
+          <div class="cs-board" id="cs-board">${boardCells}</div>
+        </div>
         ${over ? `
           <div class="cs-over">
-            <div class="t">No room left</div>
+            <div class="t">The well is jammed</div>
             <div class="d">Final score: <b>${score.toLocaleString()}</b>${lastChips>0 ? `<br>The house pays <b>${lastChips.toLocaleString()}</b> chips for the show.` : ''}</div>
             <button class="btn primary" id="cs-again">Play Again</button>
           </div>
         ` : `
           <div class="cs-tray" id="cs-tray">${tray.map((p,i)=>pieceHtml(p,i)).join('')}</div>
-          <div class="cs-help">tap a piece, then tap the board &middot; fill any row or column to clear it<br>pool ${POPMIN}+ of one suit to pop them &middot; falls chain into cascades</div>
+          <div class="cs-help">tap a piece, then tap a column &mdash; it drops like tetris<br>full rows burst &middot; ${POPMIN}+ of a suit pops &middot; &#9733; is wild &middot; the rubble falls and chains</div>
           <div class="btn-row" style="margin-top:12px;">
             <button class="btn" id="cs-new">New Board</button>
           </div>
@@ -2759,12 +2811,12 @@ const Cascade = (function(){
       board.addEventListener('click', (e)=>{
         const cell = e.target.closest('.cs-cell');
         if(!cell || selected<0) return;
-        place(selected, parseInt(cell.dataset.r,10), parseInt(cell.dataset.c,10));
+        place(selected, parseInt(cell.dataset.c,10));
       });
       board.addEventListener('mouseover', (e)=>{
         const cell = e.target.closest('.cs-cell');
         if(!cell) return;
-        showGhost(board, parseInt(cell.dataset.r,10), parseInt(cell.dataset.c,10));
+        showGhost(board, parseInt(cell.dataset.c,10));
       });
       board.addEventListener('mouseleave', ()=> clearGhost(board));
       const nb = el.querySelector('#cs-new');
@@ -2785,6 +2837,7 @@ const Cascade = (function(){
     setTray: (t)=>{ tray = t; render(); },
     place,
     newGame,
+    dims: ()=>({W, H}),
   } };
 })();
 
